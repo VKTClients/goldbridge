@@ -166,7 +166,7 @@ function PortfolioChart({ data }: { data: { week: string; value: number }[] }) {
 }
 
 export default function DashboardPage() {
-  const { user, isLoading } = useAuth();
+  const { user, isLoading, logout } = useAuth();
   const [activeTab, setActiveTab] = useState<TabKey>("overview");
   const [showNotifications, setShowNotifications] = useState(false);
   const [copiedRef, setCopiedRef] = useState(false);
