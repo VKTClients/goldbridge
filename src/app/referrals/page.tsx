@@ -36,6 +36,22 @@ export default function ReferralsPage() {
     setShowAuthModal(true);
   };
 
+  const handleShareWhatsApp = () => {
+    const message = `Join me on Goldbridge Capital and start investing! Use my referral code: ${referralCode}\n\n${referralLink}`;
+    window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank');
+  };
+
+  const handleShareTwitter = () => {
+    const message = `Just joined Goldbridge Capital - amazing investment platform! Use my referral code: ${referralCode} to get 0.5% bonus on your first investment. ${referralLink}`;
+    window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(message)}`, '_blank');
+  };
+
+  const handleShareEmail = () => {
+    const subject = "Join me on Goldbridge Capital";
+    const body = `Hi,\n\nI wanted to share this amazing investment platform with you - Goldbridge Capital.\n\nUse my referral code: ${referralCode}\n\nThis gives you a 0.5% bonus on your first investment!\n\nSign up here: ${referralLink}\n\nLet me know if you have any questions!\n\nBest regards`;
+    window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  };
+
   
   const benefits = [
     {
@@ -139,13 +155,22 @@ export default function ReferralsPage() {
                     </div>
                   </div>
                   <div className="flex gap-2 justify-center">
-                    <button className="px-3 py-1.5 bg-white/[0.02] border border-white/[0.06] rounded-lg text-[#666] text-xs hover:border-white/[0.1] transition-colors">
+                    <button 
+                      onClick={handleShareWhatsApp}
+                      className="px-3 py-1.5 bg-white/[0.02] border border-white/[0.06] rounded-lg text-[#666] text-xs hover:border-white/[0.1] hover:text-white transition-colors"
+                    >
                       Share on WhatsApp
                     </button>
-                    <button className="px-3 py-1.5 bg-white/[0.02] border border-white/[0.06] rounded-lg text-[#666] text-xs hover:border-white/[0.1] transition-colors">
+                    <button 
+                      onClick={handleShareTwitter}
+                      className="px-3 py-1.5 bg-white/[0.02] border border-white/[0.06] rounded-lg text-[#666] text-xs hover:border-white/[0.1] hover:text-white transition-colors"
+                    >
                       Share on Twitter
                     </button>
-                    <button className="px-3 py-1.5 bg-white/[0.02] border border-white/[0.06] rounded-lg text-[#666] text-xs hover:border-white/[0.1] transition-colors">
+                    <button 
+                      onClick={handleShareEmail}
+                      className="px-3 py-1.5 bg-white/[0.02] border border-white/[0.06] rounded-lg text-[#666] text-xs hover:border-white/[0.1] hover:text-white transition-colors"
+                    >
                       Share via Email
                     </button>
                   </div>
