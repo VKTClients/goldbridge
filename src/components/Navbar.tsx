@@ -6,11 +6,10 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/context/AuthContext";
 
 const navLinks = [
-  { label: "Home", href: "#home" },
-  { label: "Markets", href: "#markets" },
-  { label: "Portfolio", href: "#invest" },
-  { label: "Features", href: "#features" },
-  { label: "Packages", href: "#pricing" },
+  { label: "Home", href: "/" },
+  { label: "About", href: "/about" },
+  { label: "Trust", href: "/trust" },
+  { label: "Packages", href: "/#pricing" },
 ];
 
 export default function Navbar() {

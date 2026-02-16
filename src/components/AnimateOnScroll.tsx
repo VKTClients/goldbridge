@@ -27,27 +27,34 @@ export default function AnimateOnScroll({
   distance,
 }: AnimateOnScrollProps) {
   const ref = useRef(null);
-  const [isMobile, setIsMobile] = useState(false);
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
-  const isInView = useInView(ref, { once, margin: isMobile ? "-30px" : "-60px" });
+  const [mounted, setMounted] = useState(false);
+  const [isMobile, setIsMobile] = useState(true); // Default to mobile to avoid blur flash
+  const isInView = useInView(ref, { once, margin: "-20px" });
 
   useEffect(() => {
+    setMounted(true);
     setIsMobile(window.innerWidth < 768);
-    setPrefersReducedMotion(window.matchMedia("(prefers-reduced-motion: reduce)").matches);
     
     const handleResize = () => setIsMobile(window.innerWidth < 768);
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Skip animations entirely if user prefers reduced motion
-  if (prefersReducedMotion) {
-    return <div ref={ref} className={className}>{children}</div>;
+  // On mobile or before mount, render without animations to prevent blur flash
+  if (!mounted || isMobile) {
+    return (
+      <div 
+        ref={ref} 
+        className={className}
+        style={{ opacity: isInView ? 1 : 0, transition: 'opacity 0.3s ease-out' }}
+      >
+        {children}
+      </div>
+    );
   }
 
-  // Simpler, faster animations on mobile
-  const dist = distance ?? (isMobile ? 16 : 40);
-  const mobileDuration = Math.min(duration * 0.6, 0.4);
+  // Desktop animations
+  const dist = distance ?? 40;
 
   const directions = {
     up: { y: dist, x: 0 },
@@ -68,12 +75,11 @@ export default function AnimateOnScroll({
     x: 0,
   };
 
-  // Disable scale and blur on mobile for performance
-  if (scale && !isMobile) {
+  if (scale) {
     initial.scale = 0.92;
     visible.scale = 1;
   }
-  if (blur && !isMobile) {
+  if (blur) {
     initial.filter = "blur(8px)";
     visible.filter = "blur(0px)";
   }
@@ -85,8 +91,8 @@ export default function AnimateOnScroll({
       initial={initial}
       animate={isInView ? visible : initial}
       transition={{
-        duration: isMobile ? mobileDuration : duration,
-        delay: isMobile ? Math.min(delay * 0.3, 0.1) : delay,
+        duration,
+        delay,
         ease: [0.22, 1, 0.36, 1],
       }}
     >
