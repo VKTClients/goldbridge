@@ -3,6 +3,7 @@
 import { Check, ArrowUpRight } from "lucide-react";
 import AnimateOnScroll from "./AnimateOnScroll";
 import TiltCard from "./TiltCard";
+import { useAuth } from "@/context/AuthContext";
 
 const plans = [
   {
@@ -53,6 +54,16 @@ const plans = [
 ];
 
 export default function Plans() {
+  const { user, setShowAuthModal } = useAuth();
+
+  const handleGetStarted = () => {
+    if (user) {
+      window.location.href = "/dashboard";
+    } else {
+      setShowAuthModal(true);
+    }
+  };
+
   return (
     <section id="pricing" className="section-padding relative">
       <div className="max-w-[1400px] mx-auto px-5 md:px-0">
@@ -128,8 +139,8 @@ export default function Plans() {
               </ul>
 
               {/* CTA */}
-              <a
-                href="/invest"
+              <button
+                onClick={handleGetStarted}
                 className={`w-full flex items-center justify-center gap-2 py-3 rounded-full text-xs font-semibold transition-all duration-300 ${
                   plan.popular
                     ? "btn-gold"
@@ -138,7 +149,7 @@ export default function Plans() {
               >
                 Get Started
                 <ArrowUpRight size={12} />
-              </a>
+              </button>
             </div>
             </TiltCard>
             </AnimateOnScroll>

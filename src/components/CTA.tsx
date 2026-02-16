@@ -2,8 +2,11 @@
 
 import { ArrowUpRight } from "lucide-react";
 import AnimateOnScroll from "./AnimateOnScroll";
+import { useAuth } from "@/context/AuthContext";
 
 export default function CTA() {
+  const { setShowAuthModal } = useAuth();
+
   return (
     <section className="section-padding relative overflow-hidden">
       {/* Aurora */}
@@ -31,12 +34,15 @@ export default function CTA() {
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 px-4 sm:px-0">
-              <a href="/invest" className="btn-gold gap-2 px-8 py-3.5 sm:py-3 text-sm w-full sm:w-auto justify-center">
+              <button 
+                onClick={() => setShowAuthModal(true)}
+                className="btn-gold gap-2 px-8 py-3.5 sm:py-3 text-sm w-full sm:w-auto justify-center"
+              >
                 Start Investing
                 <ArrowUpRight size={14} />
-              </a>
-              <a href="#markets" className="btn-outline px-8 py-3.5 sm:py-3 text-sm w-full sm:w-auto justify-center">
-                Explore Markets
+              </button>
+              <a href="/trust" className="btn-outline px-8 py-3.5 sm:py-3 text-sm w-full sm:w-auto justify-center">
+                Why Trust Us
               </a>
             </div>
 

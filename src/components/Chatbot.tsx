@@ -12,34 +12,132 @@ interface Message {
 }
 
 const quickReplies = [
-  "How do I invest?",
-  "What are the returns?",
-  "How do withdrawals work?",
-  "Contact support",
+  "💰 How do I start investing?",
+  "📈 What returns can I expect?",
+  "🏦 How do withdrawals work?",
+  "🔐 What is KYC verification?",
+  "💳 Payment methods accepted?",
+  "📞 Contact support",
 ];
 
-const botResponses: Record<string, string> = {
-  "how do i invest": "Getting started is easy! Click 'Make an Investment' from your dashboard or visit our /invest page. Choose your package (Starter, Growth, or Premium), enter your amount, select your payment method (Card or MoonPay), and confirm. Your investment will be active immediately!",
-  "what are the returns": "Our weekly returns vary by package:\n\n• **Starter** (R1,000–R4,999): 15–20% per week\n• **Growth** (R5,000–R9,999): 25–35% per week\n• **Premium** (R10,000+): 40–50% per week\n\nReturns are paid out every Monday directly to your account.",
-  "how do withdrawals work": "Withdrawals are processed within 24 hours on business days. Simply go to your Dashboard → Transactions → Request Withdrawal. Enter the amount and your bank details. There are no lock-up periods — you can withdraw anytime!",
-  "contact support": "You can reach our support team via:\n\n• **Email**: support@goldbridge.capital\n• **WhatsApp**: +27 12 345 6789\n• **Live Chat**: Available 24/7\n\nPremium clients have access to a dedicated account manager.",
-  "default": "Thanks for your message! I'm here to help with any questions about investing with GoldBridge Capital. You can ask about our packages, returns, how to get started, or withdrawals. For complex queries, our support team is available 24/7.",
-};
+const suggestedQuestions = [
+  "What's the minimum investment?",
+  "How often are payouts?",
+  "Is my money safe?",
+  "How long until I see returns?",
+];
+
+// Keyword-based response system
+interface KeywordResponse {
+  keywords: string[];
+  response: string;
+  followUp?: string[];
+}
+
+const keywordResponses: KeywordResponse[] = [
+  {
+    keywords: ["invest", "start", "begin", "deposit", "put money", "get started"],
+    response: "Getting started is easy! 🚀\n\n**3 Simple Steps:**\n1. Sign up or log in to your account\n2. Choose your investment package (Starter, Growth, or Premium)\n3. Fund via Card or MoonPay\n\nYour investment activates immediately and you'll start earning weekly returns!",
+    followUp: ["What's the minimum?", "Which package is best?"]
+  },
+  {
+    keywords: ["return", "profit", "earn", "make money", "roi", "percentage", "weekly"],
+    response: "Our weekly returns vary by tier:\n\n💎 **Starter** (R1,000–R4,999): 15–20% weekly\n🥇 **Growth** (R5,000–R9,999): 25–35% weekly\n👑 **Premium** (R10,000+): 40–50% weekly\n\nReturns are paid every Monday directly to your account balance.",
+    followUp: ["How do I upgrade?", "When are payouts?"]
+  },
+  {
+    keywords: ["withdraw", "cash out", "take out", "get my money", "payout", "bank"],
+    response: "Withdrawals are quick and easy! 💸\n\n• **Processing time:** 1-2 business days\n• **No lock-up periods** — withdraw anytime\n• **No hidden fees** on withdrawals\n\nGo to Dashboard → Click 'Withdraw' → Enter amount and bank details. That's it!",
+    followUp: ["What's the minimum withdrawal?", "Which banks supported?"]
+  },
+  {
+    keywords: ["kyc", "verify", "verification", "identity", "document", "id"],
+    response: "KYC (Know Your Customer) verification unlocks full features! 🔐\n\n**What you need:**\n• Valid ID (passport, national ID, or driver's license)\n• Proof of address (utility bill or bank statement)\n• A selfie photo\n\n**Benefits:** Higher withdrawal limits, faster processing, full account access.\n\nVerification takes 1-2 business days.",
+    followUp: ["How do I verify?", "Is it mandatory?"]
+  },
+  {
+    keywords: ["payment", "pay", "card", "moonpay", "crypto", "fund", "method"],
+    response: "We accept multiple payment methods! 💳\n\n• **Credit/Debit Card** — Visa, Mastercard (instant)\n• **MoonPay** — Pay with crypto or bank transfer\n• **EFT** — Direct bank transfer (1-2 days)\n\nAll payments are secured with bank-grade encryption.",
+    followUp: ["Is MoonPay safe?", "Any fees?"]
+  },
+  {
+    keywords: ["safe", "secure", "trust", "legit", "scam", "real", "protection"],
+    response: "Your security is our top priority! 🛡️\n\n✅ **Bank-grade encryption** (256-bit SSL)\n✅ **Regulated & compliant** (KYC/AML)\n✅ **Cold storage** for digital assets\n✅ **24/7 monitoring** & fraud detection\n✅ **25+ years** in business since 2000\n\nOver 12,000 investors trust us with $1.8B+ in assets.",
+    followUp: ["How long in business?", "Where are you based?"]
+  },
+  {
+    keywords: ["minimum", "min", "least", "smallest", "start with"],
+    response: "You can start investing with as little as **R1,000** (about $54 USD)! 💰\n\n**Minimum by tier:**\n• Starter: R1,000\n• Growth: R5,000\n• Premium: R10,000\n\nNo maximum limit — invest as much as you're comfortable with.",
+    followUp: ["What tier is best?", "Can I upgrade later?"]
+  },
+  {
+    keywords: ["fee", "charge", "cost", "commission", "hidden"],
+    response: "We believe in transparency! 📋\n\n• **No deposit fees**\n• **No withdrawal fees**\n• **No hidden charges**\n• **No management fees**\n\nWhat you invest is what works for you. Returns are calculated on your full investment amount.",
+    followUp: ["How do you make money?", "Any catches?"]
+  },
+  {
+    keywords: ["support", "help", "contact", "email", "phone", "whatsapp", "chat"],
+    response: "We're here to help! 📞\n\n• **Email:** support@goldbridge.capital\n• **WhatsApp:** +27 12 345 6789\n• **Live Chat:** Available 24/7 (that's me! 🤖)\n\nPremium clients get a dedicated account manager for personalized support.",
+    followUp: ["Response time?", "Premium benefits?"]
+  },
+  {
+    keywords: ["referral", "refer", "invite", "friend", "bonus", "affiliate"],
+    response: "Earn by sharing! 🎁\n\n**Referral Program:**\n• Get a unique referral link from your dashboard\n• Earn **5% bonus** on every friend's first investment\n• No limit on referrals!\n\nYour friends also get a welcome bonus when they sign up.",
+    followUp: ["How do I get my link?", "When do I get paid?"]
+  },
+  {
+    keywords: ["package", "plan", "tier", "level", "upgrade", "difference"],
+    response: "We offer 3 investment tiers:\n\n💎 **Starter** (R1K–R5K)\n→ 15-20% weekly returns\n→ Perfect for beginners\n\n🥇 **Growth** (R5K–R10K)\n→ 25-35% weekly returns\n→ Best value tier\n\n👑 **Premium** (R10K+)\n→ 40-50% weekly returns\n→ Priority support & features\n\nYou can upgrade anytime by adding more funds!",
+    followUp: ["Which is most popular?", "Can I have multiple?"]
+  },
+  {
+    keywords: ["when", "payout", "monday", "paid", "receive", "schedule"],
+    response: "Payouts are processed every **Monday**! 📅\n\n• Returns calculated on Sunday night\n• Credited to your account Monday morning\n• Withdraw anytime or reinvest\n\nYou'll receive a notification when your payout is ready.",
+    followUp: ["Can I auto-reinvest?", "What time Monday?"]
+  },
+  {
+    keywords: ["account", "login", "password", "sign", "register", "forgot"],
+    response: "Account help:\n\n🔑 **Forgot password?** Click 'Forgot Password' on login page\n📧 **Can't login?** Check your email for verification\n🆕 **New user?** Click 'Sign Up' to create account\n\nNeed more help? Contact support@goldbridge.capital",
+    followUp: ["Reset my password", "Delete my account"]
+  },
+];
 
 function getBotResponse(input: string): string {
   const lower = input.toLowerCase().trim();
-  for (const key of Object.keys(botResponses)) {
-    if (key !== "default" && lower.includes(key)) {
-      return botResponses[key];
+  
+  // Check for greetings
+  if (/^(hi|hello|hey|good morning|good afternoon|good evening|howdy|sup)/.test(lower)) {
+    return "Hello! 👋 Welcome to GoldBridge Capital. I'm here to help you with:\n\n• Investment packages & returns\n• Deposits & withdrawals\n• Account & KYC verification\n• General questions\n\nWhat would you like to know?";
+  }
+  
+  // Check for thanks
+  if (/thank|thanks|thx|appreciate/.test(lower)) {
+    return "You're welcome! 😊 Is there anything else I can help you with? Feel free to ask about investments, withdrawals, or anything else.";
+  }
+  
+  // Check for goodbye
+  if (/bye|goodbye|see you|later|exit|quit/.test(lower)) {
+    return "Goodbye! 👋 Thanks for chatting with GoldBridge. We're here 24/7 whenever you need us. Happy investing! 💰";
+  }
+  
+  // Find best matching keyword response
+  let bestMatch: KeywordResponse | null = null;
+  let maxMatches = 0;
+  
+  for (const kr of keywordResponses) {
+    const matches = kr.keywords.filter(kw => lower.includes(kw)).length;
+    if (matches > maxMatches) {
+      maxMatches = matches;
+      bestMatch = kr;
     }
   }
-  if (lower.includes("hello") || lower.includes("hi") || lower.includes("hey")) {
-    return "Hello! 👋 Welcome to GoldBridge Capital. How can I assist you today? Feel free to ask about our investment packages, returns, or how to get started.";
+  
+  if (bestMatch && maxMatches > 0) {
+    return bestMatch.response;
   }
-  if (lower.includes("thank")) {
-    return "You're welcome! Is there anything else I can help you with?";
-  }
-  return botResponses["default"];
+  
+  // Default response with suggestions
+  return "I'm not sure I understood that, but I'm here to help! 🤔\n\nTry asking about:\n• How to start investing\n• Weekly returns & payouts\n• Withdrawals & bank transfers\n• KYC verification\n• Payment methods\n\nOr type 'support' to contact our team directly.";
 }
 
 export default function Chatbot() {
@@ -211,17 +309,38 @@ export default function Chatbot() {
             </div>
 
             {/* Quick Replies */}
-            {messages.length < 3 && (
-              <div className="px-4 pb-2 flex gap-2 flex-wrap">
-                {quickReplies.map((reply) => (
-                  <button
-                    key={reply}
-                    onClick={() => sendMessage(reply)}
-                    className="text-[10px] px-3 py-1.5 rounded-full bg-white/[0.03] border border-white/[0.06] text-[#888] hover:border-[#D4AF37]/30 hover:text-[#D4AF37] transition-colors"
-                  >
-                    {reply}
-                  </button>
-                ))}
+            {messages.length < 4 && (
+              <div className="px-4 pb-2">
+                <p className="text-[#444] text-[9px] mb-2 uppercase tracking-wider">Quick questions:</p>
+                <div className="flex gap-2 flex-wrap">
+                  {quickReplies.slice(0, 4).map((reply) => (
+                    <button
+                      key={reply}
+                      onClick={() => sendMessage(reply)}
+                      className="text-[10px] px-3 py-1.5 rounded-full bg-white/[0.03] border border-white/[0.06] text-[#888] hover:border-[#D4AF37]/30 hover:text-[#D4AF37] transition-colors"
+                    >
+                      {reply}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+            
+            {/* Suggested Questions after some messages */}
+            {messages.length >= 4 && messages.length < 8 && (
+              <div className="px-4 pb-2">
+                <p className="text-[#444] text-[9px] mb-2 uppercase tracking-wider">You might also ask:</p>
+                <div className="flex gap-2 flex-wrap">
+                  {suggestedQuestions.slice(0, 3).map((q) => (
+                    <button
+                      key={q}
+                      onClick={() => sendMessage(q)}
+                      className="text-[10px] px-3 py-1.5 rounded-full bg-[#D4AF37]/[0.05] border border-[#D4AF37]/[0.15] text-[#D4AF37]/80 hover:bg-[#D4AF37]/[0.1] transition-colors"
+                    >
+                      {q}
+                    </button>
+                  ))}
+                </div>
               </div>
             )}
 

@@ -6,6 +6,12 @@ interface User {
   email: string;
   name: string;
   joined: string;
+  kycStatus: "pending" | "submitted" | "verified";
+  kycDocuments?: {
+    idDocument?: string;
+    proofOfAddress?: string;
+    selfie?: string;
+  };
 }
 
 interface AuthContextType {
@@ -16,6 +22,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<boolean>;
   signup: (name: string, email: string, password: string) => Promise<boolean>;
   logout: () => void;
+  updateKycStatus: (status: User["kycStatus"], documents?: User["kycDocuments"]) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -54,6 +61,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       email,
       name: existing?.name || email.split("@")[0],
       joined: new Date().toISOString(),
+      kycStatus: "pending",
     };
 
     localStorage.setItem("gb_user", JSON.stringify(userData));
@@ -78,6 +86,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       email,
       name,
       joined: new Date().toISOString(),
+      kycStatus: "pending",
     };
 
     localStorage.setItem("gb_user", JSON.stringify(userData));
@@ -86,13 +95,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return true;
   };
 
+  const updateKycStatus = (status: User["kycStatus"], documents?: User["kycDocuments"]) => {
+    if (!user) return;
+    const updatedUser = { ...user, kycStatus: status, kycDocuments: documents || user.kycDocuments };
+    localStorage.setItem("gb_user", JSON.stringify(updatedUser));
+    setUser(updatedUser);
+  };
+
   const logout = () => {
     localStorage.removeItem("gb_user");
     setUser(null);
   };
 
   return (
-    <AuthContext.Provider value={{ user, isLoading, showAuthModal, setShowAuthModal, login, signup, logout }}>
+    <AuthContext.Provider value={{ user, isLoading, showAuthModal, setShowAuthModal, login, signup, logout, updateKycStatus }}>
       {children}
     </AuthContext.Provider>
   );

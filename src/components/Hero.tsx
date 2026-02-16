@@ -4,6 +4,7 @@ import { ArrowUpRight, Shield, TrendingUp } from "lucide-react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef, useState, useEffect } from "react";
 import Marquee from "./Marquee";
+import { useAuth } from "@/context/AuthContext";
 
 const partners = [
   "Bloomberg", "Reuters", "Nasdaq", "J.P. Morgan", "Goldman Sachs", "BlackRock", "Fidelity"
@@ -12,6 +13,7 @@ const partners = [
 export default function Hero() {
   const sectionRef = useRef(null);
   const [isMobile, setIsMobile] = useState(false);
+  const { setShowAuthModal } = useAuth();
 
   useEffect(() => {
     setIsMobile(window.innerWidth < 768);
@@ -139,12 +141,15 @@ export default function Hero() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.9, duration: 0.6 }}
         >
-          <a href="/invest" className="btn-gold gap-2 px-8 py-3 text-sm w-full sm:w-auto justify-center">
+          <button 
+            onClick={() => setShowAuthModal(true)}
+            className="btn-gold gap-2 px-8 py-3 text-sm w-full sm:w-auto justify-center"
+          >
             Begin Your Journey
             <ArrowUpRight size={14} />
-          </a>
-          <a href="#markets" className="btn-outline gap-2 px-8 py-3 text-sm w-full sm:w-auto justify-center">
-            View Markets
+          </button>
+          <a href="/about" className="btn-outline gap-2 px-8 py-3 text-sm w-full sm:w-auto justify-center">
+            Learn More
           </a>
         </motion.div>
 

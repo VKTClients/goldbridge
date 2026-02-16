@@ -8,9 +8,11 @@ import {
   BarChart3, CreditCard, Settings, Bell, Home, Shield, Copy,
   Check, Users, Download, HelpCircle, AlertTriangle, Target,
   Gift, MessageCircle, FileText, X, ArrowRight, Zap,
-  ShieldCheck, Smartphone, Lock
+  ShieldCheck, Smartphone, Lock, CheckCircle2
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import KYCModal from "@/components/KYCModal";
+import WithdrawModal from "@/components/WithdrawModal";
 
 // Realistic mock investments
 const mockInvestments = [
@@ -172,6 +174,8 @@ export default function DashboardPage() {
   const [copiedRef, setCopiedRef] = useState(false);
   const [showSupport, setShowSupport] = useState(false);
   const [txFilter, setTxFilter] = useState<"all" | "deposit" | "return" | "withdrawal">("all");
+  const [showKYCModal, setShowKYCModal] = useState(false);
+  const [showWithdrawModal, setShowWithdrawModal] = useState(false);
   const investments = mockInvestments;
 
   const referralCode = user ? `GB-${user.name.replace(/\s/g, "").toUpperCase().slice(0, 4)}-${Math.random().toString(36).slice(2, 6).toUpperCase()}` : "";
@@ -211,7 +215,16 @@ export default function DashboardPage() {
     setTimeout(() => setCopiedRef(false), 2000);
   };
 
+  const availableBalance = currentValue; // Available for withdrawal
+
   return (
+    <>
+      <KYCModal isOpen={showKYCModal} onClose={() => setShowKYCModal(false)} />
+      <WithdrawModal 
+        isOpen={showWithdrawModal} 
+        onClose={() => setShowWithdrawModal(false)} 
+        availableBalance={availableBalance}
+      />
     <div className="min-h-screen bg-[#060608] flex">
       {/* Sidebar — Desktop */}
       <aside className="hidden md:flex flex-col w-[240px] bg-[#09090c] border-r border-white/[0.04] fixed top-0 left-0 h-screen z-40">
@@ -448,21 +461,53 @@ export default function DashboardPage() {
           </div>
 
           {/* KYC Verification Banner */}
-          <div className="mb-4 bg-amber-500/[0.04] border border-amber-500/[0.12] rounded-xl p-3.5 md:p-4 flex flex-col sm:flex-row items-start sm:items-center gap-3 justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-lg bg-amber-500/10 flex items-center justify-center flex-shrink-0">
-                <AlertTriangle size={16} className="text-amber-400" />
+          {user.kycStatus === "pending" && (
+            <div className="mb-4 bg-amber-500/[0.04] border border-amber-500/[0.12] rounded-xl p-3.5 md:p-4 flex flex-col sm:flex-row items-start sm:items-center gap-3 justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-lg bg-amber-500/10 flex items-center justify-center flex-shrink-0">
+                  <AlertTriangle size={16} className="text-amber-400" />
+                </div>
+                <div>
+                  <p className="text-white text-xs font-medium">Complete your KYC verification</p>
+                  <p className="text-[#555] text-[10px]">Verify your identity to unlock higher withdrawal limits & full features</p>
+                </div>
+              </div>
+              <button 
+                onClick={() => setShowKYCModal(true)}
+                className="flex items-center gap-1.5 text-[10px] font-semibold text-amber-400 bg-amber-500/10 border border-amber-500/20 px-3.5 py-1.5 rounded-lg hover:bg-amber-500/15 transition-colors whitespace-nowrap"
+              >
+                <Shield size={11} />
+                Verify Now
+              </button>
+            </div>
+          )}
+          {user.kycStatus === "submitted" && (
+            <div className="mb-4 bg-blue-500/[0.04] border border-blue-500/[0.12] rounded-xl p-3.5 md:p-4 flex flex-col sm:flex-row items-start sm:items-center gap-3 justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-lg bg-blue-500/10 flex items-center justify-center flex-shrink-0">
+                  <Clock size={16} className="text-blue-400" />
+                </div>
+                <div>
+                  <p className="text-white text-xs font-medium">KYC verification under review</p>
+                  <p className="text-[#555] text-[10px]">We're reviewing your documents. This usually takes 1-2 business days.</p>
+                </div>
+              </div>
+              <span className="text-[10px] font-medium text-blue-400 bg-blue-500/10 border border-blue-500/20 px-3.5 py-1.5 rounded-lg">
+                Under Review
+              </span>
+            </div>
+          )}
+          {user.kycStatus === "verified" && (
+            <div className="mb-4 bg-emerald-500/[0.04] border border-emerald-500/[0.12] rounded-xl p-3.5 md:p-4 flex items-center gap-3">
+              <div className="w-9 h-9 rounded-lg bg-emerald-500/10 flex items-center justify-center flex-shrink-0">
+                <CheckCircle2 size={16} className="text-emerald-400" />
               </div>
               <div>
-                <p className="text-white text-xs font-medium">Complete your KYC verification</p>
-                <p className="text-[#555] text-[10px]">Verify your identity to unlock higher withdrawal limits & full features</p>
+                <p className="text-white text-xs font-medium">Identity Verified</p>
+                <p className="text-[#555] text-[10px]">Your account is fully verified with unlimited withdrawal access.</p>
               </div>
             </div>
-            <button className="flex items-center gap-1.5 text-[10px] font-semibold text-amber-400 bg-amber-500/10 border border-amber-500/20 px-3.5 py-1.5 rounded-lg hover:bg-amber-500/15 transition-colors whitespace-nowrap">
-              <Shield size={11} />
-              Verify Now
-            </button>
-          </div>
+          )}
 
           {/* Overview Tab */}
           {activeTab === "overview" && (
@@ -477,7 +522,10 @@ export default function DashboardPage() {
                   <Wallet size={14} className="text-[#D4AF37] group-hover:scale-110 transition-transform" />
                   <span className="text-white text-[11px] font-medium">Deposit</span>
                 </a>
-                <button className="flex items-center justify-center gap-2 bg-[#0a0a0e] border border-white/[0.04] rounded-xl p-3 hover:bg-white/[0.02] hover:border-emerald-500/10 transition-all group">
+                <button 
+                  onClick={() => setShowWithdrawModal(true)}
+                  className="flex items-center justify-center gap-2 bg-[#0a0a0e] border border-white/[0.04] rounded-xl p-3 hover:bg-white/[0.02] hover:border-emerald-500/10 transition-all group"
+                >
                   <ArrowUpRight size={14} className="text-emerald-400 group-hover:scale-110 transition-transform" />
                   <span className="text-white text-[11px] font-medium">Withdraw</span>
                 </button>
@@ -996,5 +1044,6 @@ export default function DashboardPage() {
         </div>
       </main>
     </div>
+    </>
   );
 }

@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { Calculator, TrendingUp, ArrowUpRight, ChevronDown } from "lucide-react";
 import AnimateOnScroll from "./AnimateOnScroll";
 import CounterNumber from "./CounterNumber";
+import { useAuth } from "@/context/AuthContext";
 
 const tiers = [
   { name: "Starter", min: 1000, max: 4999, rate: 0.175, label: "15–20% /week" },
@@ -13,33 +14,54 @@ const tiers = [
 ];
 
 const currencies = [
-  { code: "ZAR", symbol: "R", rate: 1, name: "South African Rand" },
-  { code: "USD", symbol: "$", rate: 0.054, name: "US Dollar" },
-  { code: "EUR", symbol: "€", rate: 0.050, name: "Euro" },
-  { code: "GBP", symbol: "£", rate: 0.043, name: "British Pound" },
-  { code: "NGN", symbol: "₦", rate: 83.64, name: "Nigerian Naira" },
-  { code: "KES", symbol: "KSh", rate: 6.98, name: "Kenyan Shilling" },
-  { code: "BWP", symbol: "P", rate: 0.74, name: "Botswana Pula" },
+  { code: "ZAR", symbol: "R", toZAR: 1, name: "South African Rand" },
+  { code: "USD", symbol: "$", toZAR: 18.52, name: "US Dollar" },
+  { code: "EUR", symbol: "€", toZAR: 20.0, name: "Euro" },
+  { code: "GBP", symbol: "£", toZAR: 23.26, name: "British Pound" },
+  { code: "NGN", symbol: "₦", toZAR: 0.012, name: "Nigerian Naira" },
+  { code: "KES", symbol: "KSh", toZAR: 0.143, name: "Kenyan Shilling" },
+  { code: "BWP", symbol: "P", toZAR: 1.35, name: "Botswana Pula" },
 ];
 
 export default function InvestmentCalculator() {
-  const [amount, setAmount] = useState(10000);
+  const { user, setShowAuthModal } = useAuth();
+  const [amountInCurrency, setAmountInCurrency] = useState(540); // ~R10,000 in USD
   const [selectedTier, setSelectedTier] = useState(1);
-  const [selectedCurrency, setSelectedCurrency] = useState(0);
+  const [selectedCurrency, setSelectedCurrency] = useState(1); // Default to USD
 
   const tier = tiers[selectedTier];
   const currency = currencies[selectedCurrency];
 
-  // Clamp amount to tier range
-  const clampedAmount = Math.max(tier.min, Math.min(tier.max, amount));
+  const handleStartInvesting = () => {
+    if (user) {
+      window.location.href = "/dashboard";
+    } else {
+      setShowAuthModal(true);
+    }
+  };
+
+  // Convert input amount to ZAR for calculations
+  const amountInZAR = amountInCurrency * currency.toZAR;
+  
+  // Clamp ZAR amount to tier range
+  const clampedAmountZAR = Math.max(tier.min, Math.min(tier.max, amountInZAR));
+  
+  // Get min/max in current currency for slider
+  const minInCurrency = tier.min / currency.toZAR;
+  const maxInCurrency = tier.max / currency.toZAR;
 
   const projections = useMemo(() => {
-    const weeklyReturnZAR = clampedAmount * tier.rate;
-    const weeklyReturn = weeklyReturnZAR * currency.rate;
-    const amountInCurrency = clampedAmount * currency.rate;
+    const weeklyReturnZAR = clampedAmountZAR * tier.rate;
+    const weeklyReturnInCurrency = weeklyReturnZAR / currency.toZAR;
+    const investmentInCurrency = clampedAmountZAR / currency.toZAR;
 
-    return { weeklyReturn, amountInCurrency };
-  }, [clampedAmount, tier.rate, currency.rate]);
+    return { 
+      weeklyReturn: weeklyReturnInCurrency, 
+      investment: investmentInCurrency,
+      weeklyReturnZAR,
+      investmentZAR: clampedAmountZAR
+    };
+  }, [clampedAmountZAR, tier.rate, currency.toZAR]);
 
 
   return (
@@ -71,32 +93,32 @@ export default function InvestmentCalculator() {
               {/* Investment Amount */}
               <div>
                 <label className="text-[#555] text-[10px] uppercase tracking-[0.2em] mb-3 block">
-                  Investment Amount
+                  Investment Amount ({currency.code})
                 </label>
                 <div className="relative mb-3">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#D4AF37] font-bold text-lg">R</span>
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#D4AF37] font-bold text-lg">{currency.symbol}</span>
                   <input
                     type="number"
-                    value={amount}
-                    onChange={(e) => setAmount(Number(e.target.value))}
-                    min={tier.min}
-                    max={tier.max}
-                    inputMode="numeric"
-                    className="w-full bg-white/[0.03] border border-white/[0.06] rounded-xl pl-9 pr-4 py-3.5 text-white text-[16px] sm:text-lg font-bold font-display outline-none focus:border-[#D4AF37]/30 transition-colors tabular-nums"
+                    value={Math.round(amountInCurrency * 100) / 100}
+                    onChange={(e) => setAmountInCurrency(Number(e.target.value))}
+                    min={Math.round(minInCurrency)}
+                    max={Math.round(maxInCurrency)}
+                    inputMode="decimal"
+                    className="w-full bg-white/[0.03] border border-white/[0.06] rounded-xl pl-10 pr-4 py-3.5 text-white text-[16px] sm:text-lg font-bold font-display outline-none focus:border-[#D4AF37]/30 transition-colors tabular-nums"
                   />
                 </div>
                 <input
                   type="range"
-                  min={tier.min}
-                  max={tier.max}
-                  step={tier.min < 1000 ? 50 : tier.min < 10000 ? 500 : 1000}
-                  value={clampedAmount}
-                  onChange={(e) => setAmount(Number(e.target.value))}
+                  min={minInCurrency}
+                  max={maxInCurrency}
+                  step={minInCurrency < 100 ? 5 : minInCurrency < 1000 ? 50 : 100}
+                  value={amountInCurrency}
+                  onChange={(e) => setAmountInCurrency(Number(e.target.value))}
                   className="w-full accent-[#D4AF37] h-1 bg-white/[0.06] rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-[#D4AF37] [&::-webkit-slider-thumb]:shadow-lg [&::-webkit-slider-thumb]:shadow-[#D4AF37]/30"
                 />
                 <div className="flex justify-between mt-1.5">
-                  <span className="text-[#444] text-[10px]">R{tier.min.toLocaleString()}</span>
-                  <span className="text-[#444] text-[10px]">R{tier.max.toLocaleString()}</span>
+                  <span className="text-[#444] text-[10px]">{currency.symbol}{Math.round(minInCurrency).toLocaleString()}</span>
+                  <span className="text-[#444] text-[10px]">{currency.symbol}{Math.round(maxInCurrency).toLocaleString()}</span>
                 </div>
               </div>
 
@@ -111,7 +133,10 @@ export default function InvestmentCalculator() {
                       key={t.name}
                       onClick={() => {
                         setSelectedTier(i);
-                        setAmount(Math.max(t.min, Math.min(t.max, amount)));
+                        // Convert current amount to new tier's currency range
+                        const currentAmountZAR = amountInCurrency * currency.toZAR;
+                        const clampedZAR = Math.max(t.min, Math.min(t.max, currentAmountZAR));
+                        setAmountInCurrency(clampedZAR / currency.toZAR);
                       }}
                       className={`py-3 px-2 rounded-xl text-center transition-all duration-300 border ${
                         selectedTier === i
@@ -129,12 +154,20 @@ export default function InvestmentCalculator() {
               {/* Currency Selection */}
               <div>
                 <label className="text-[#555] text-[10px] uppercase tracking-[0.2em] mb-3 block">
-                  Display Currency
+                  Input Currency
                 </label>
                 <div className="relative">
                   <select
                     value={selectedCurrency}
-                    onChange={(e) => setSelectedCurrency(Number(e.target.value))}
+                    onChange={(e) => {
+                      const newCurrencyIndex = Number(e.target.value);
+                      const newCurrency = currencies[newCurrencyIndex];
+                      // Convert current amount to new currency
+                      const amountZAR = amountInCurrency * currency.toZAR;
+                      const newAmount = amountZAR / newCurrency.toZAR;
+                      setAmountInCurrency(Math.round(newAmount * 100) / 100);
+                      setSelectedCurrency(newCurrencyIndex);
+                    }}
                     className="w-full bg-white/[0.03] border border-white/[0.06] rounded-xl px-4 py-3 text-white text-sm outline-none focus:border-[#D4AF37]/30 transition-colors appearance-none cursor-pointer"
                   >
                     {currencies.map((c, i) => (
@@ -158,7 +191,7 @@ export default function InvestmentCalculator() {
             <div className="lg:col-span-3 glass-gold p-5 md:p-7 gold-shimmer">
               {/* Weekly Return Display */}
               <div className="text-center mb-6">
-                <p className="text-[#555] text-[10px] uppercase tracking-[0.2em] mb-3">Weekly Return</p>
+                <p className="text-[#555] text-[10px] uppercase tracking-[0.2em] mb-3">Weekly Return ({currency.code})</p>
                 <motion.p
                   key={projections.weeklyReturn}
                   initial={{ opacity: 0, y: 8 }}
@@ -168,6 +201,7 @@ export default function InvestmentCalculator() {
                   +{currency.symbol}{projections.weeklyReturn.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </motion.p>
                 <p className="text-[#444] text-xs">Every 7 days · {tier.label}</p>
+                <p className="text-[#333] text-[10px] mt-1">≈ R{projections.weeklyReturnZAR.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ZAR</p>
               </div>
 
               {/* Investment Summary */}
@@ -175,9 +209,9 @@ export default function InvestmentCalculator() {
                 <div className="glass-subtle p-4 rounded-xl text-center">
                   <p className="text-[#555] text-[10px] uppercase tracking-[0.2em] mb-1.5">Investment</p>
                   <p className="text-white text-lg font-bold font-display">
-                    {currency.symbol}{projections.amountInCurrency.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    {currency.symbol}{projections.investment.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </p>
-                  <p className="text-[#444] text-[9px] mt-0.5">{currency.code}</p>
+                  <p className="text-[#444] text-[9px] mt-0.5">≈ R{projections.investmentZAR.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })} ZAR</p>
                 </div>
                 <div className="glass-subtle p-4 rounded-xl text-center">
                   <p className="text-[#555] text-[10px] uppercase tracking-[0.2em] mb-1.5">Weekly ROI</p>
@@ -198,7 +232,7 @@ export default function InvestmentCalculator() {
                   <div className="flex justify-between items-center">
                     <span className="text-[#555] text-xs">Your Investment</span>
                     <span className="text-white text-sm font-semibold">
-                      {currency.symbol}{projections.amountInCurrency.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      {currency.symbol}{projections.investment.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </span>
                   </div>
                   <div className="flex justify-between items-center">
@@ -211,7 +245,7 @@ export default function InvestmentCalculator() {
                   <div className="flex justify-between items-center">
                     <span className="text-[#888] text-xs font-medium">After 1 Week</span>
                     <span className="text-[#D4AF37] text-base font-bold">
-                      {currency.symbol}{(projections.amountInCurrency + projections.weeklyReturn).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      {currency.symbol}{(projections.investment + projections.weeklyReturn).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </span>
                   </div>
                 </div>
@@ -219,10 +253,13 @@ export default function InvestmentCalculator() {
 
               {/* CTA */}
               <div className="mt-6 flex flex-col sm:flex-row items-center gap-3">
-                <a href="/invest" className="btn-gold gap-2 px-6 py-3 text-sm w-full sm:w-auto justify-center">
-                  Start With R{clampedAmount.toLocaleString()}
+                <button 
+                  onClick={handleStartInvesting}
+                  className="btn-gold gap-2 px-6 py-3 text-sm w-full sm:w-auto justify-center"
+                >
+                  Start With {currency.symbol}{Math.round(projections.investment).toLocaleString()}
                   <ArrowUpRight size={14} />
-                </a>
+                </button>
                 <p className="text-[#444] text-[10px]">No lock-ups · Withdraw anytime</p>
               </div>
             </div>
