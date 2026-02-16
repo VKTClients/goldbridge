@@ -6,9 +6,9 @@ import TiltCard from "./TiltCard";
 
 const stats = [
   { value: "$6.3T+", label: "Global E-Commerce Revenue (2024)" },
-  { value: "24%", label: "Year-Over-Year Growth" },
+  { value: "8-10%", label: "Annual Growth" },
   { value: "2.7B+", label: "Digital Buyers Worldwide" },
-  { value: "72%", label: "Of Purchases Now Online-Influenced" },
+  { value: "70%+", label: "Of Purchases Influenced by Online Research" },
 ];
 
 const pillars = [
