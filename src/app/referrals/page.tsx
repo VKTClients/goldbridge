@@ -36,42 +36,22 @@ export default function ReferralsPage() {
     setShowAuthModal(true);
   };
 
-  const tiers = [
-    {
-      level: "Level 1",
-      commission: "10%",
-      description: "Direct referrals",
-      color: "text-[#D4AF37]"
-    },
-    {
-      level: "Level 2", 
-      commission: "5%",
-      description: "Their referrals",
-      color: "text-[#C9A84C]"
-    },
-    {
-      level: "Level 3",
-      commission: "3%", 
-      description: "Third level referrals",
-      color: "text-[#B8942E]"
-    }
-  ];
-
+  
   const benefits = [
     {
       icon: TrendingUp,
-      title: "Lifetime Commissions",
-      description: "Earn commissions on every investment your referrals make, forever."
+      title: "Investment Bonus",
+      description: "Get 0.5% extra returns on your next investment for each successful referral."
     },
     {
       icon: Users,
-      title: "3-Tier System",
-      description: "Earn from your direct referrals and their referrals up to 3 levels deep."
+      title: "Stackable Bonuses",
+      description: "Multiple referrals? Stack your bonuses. 3 referrals = 1.5% extra on your next investment."
     },
     {
       icon: Gift,
       title: "No Limits",
-      description: "No cap on how much you can earn. Refer as many people as you want."
+      description: "No cap on referrals or bonuses. Refer as many friends as you want."
     },
     {
       icon: Share2,
@@ -101,7 +81,7 @@ export default function ReferralsPage() {
                   Earn <span className="gold-text">Together</span>
                 </h1>
                 <p className="text-[#555] text-sm md:text-base max-w-2xl mx-auto leading-relaxed px-2">
-                  Share Goldbridge Capital with your network and earn lifetime commissions on every investment your referrals make.
+                  Share Goldbridge Capital with your network. When your friends invest, you get an additional 0.5% bonus on your next investment.
                 </p>
               </div>
             </AnimateOnScroll>
@@ -112,7 +92,7 @@ export default function ReferralsPage() {
                 <div className="glass-gold p-6 md:p-8 mb-12 max-w-2xl mx-auto">
                   <div className="text-center mb-6">
                     <h2 className="text-white text-xl font-semibold mb-2">Have a Referral Code?</h2>
-                    <p className="text-[#888] text-sm">Enter your referral code to get started with exclusive benefits</p>
+                    <p className="text-[#888] text-sm">Enter your referral code to get 0.5% bonus on your first investment</p>
                   </div>
                   <div className="flex flex-col sm:flex-row gap-3">
                     <input
@@ -141,7 +121,7 @@ export default function ReferralsPage() {
                 <div className="glass-subtle p-6 md:p-8 mb-12 max-w-2xl mx-auto">
                   <div className="text-center mb-6">
                     <h2 className="text-white text-xl font-semibold mb-2">Your Referral Code</h2>
-                    <p className="text-[#888] text-sm">Share this code with friends and start earning commissions</p>
+                    <p className="text-[#888] text-sm">Share this code with friends and earn 0.5% bonus on your next investment</p>
                   </div>
                   <div className="bg-[#0a0a0e] border border-white/[0.06] rounded-xl p-4 mb-4">
                     <div className="flex items-center justify-between">
@@ -176,22 +156,27 @@ export default function ReferralsPage() {
             {/* Commission Tiers */}
             <AnimateOnScroll delay={0.15}>
               <div className="text-center mb-8">
-                <h2 className="text-white text-2xl font-semibold font-display mb-2">Commission Structure</h2>
-                <p className="text-[#555] text-sm">Earn up to 18% total commission across 3 levels</p>
+                <h2 className="text-white text-2xl font-semibold font-display mb-2">How It Works</h2>
+                <p className="text-[#555] text-sm">Simple referral system with investment bonuses</p>
               </div>
               
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-12">
-                {tiers.map((tier, i) => (
-                  <TiltCard key={tier.level}>
-                    <div className="glass p-6 text-center h-full">
-                      <div className="w-12 h-12 rounded-full bg-[#D4AF37]/[0.1] border border-[#D4AF37]/[0.2] flex items-center justify-center mx-auto mb-4">
-                        <span className={`text-xl font-bold ${tier.color}`}>{tier.commission}</span>
-                      </div>
-                      <h3 className="text-white text-lg font-semibold mb-1">{tier.level}</h3>
-                      <p className="text-[#555] text-sm">{tier.description}</p>
+              <div className="glass-gold p-8 md:p-10 max-w-4xl mx-auto mb-12">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <div className="text-center">
+                    <div className="w-16 h-16 rounded-full bg-[#D4AF37]/[0.1] border border-[#D4AF37]/[0.2] flex items-center justify-center mx-auto mb-4">
+                      <span className="text-2xl font-bold text-[#D4AF37]">0.5%</span>
                     </div>
-                  </TiltCard>
-                ))}
+                    <h3 className="text-white text-lg font-semibold mb-2">Your Bonus</h3>
+                    <p className="text-[#555] text-sm">Get 0.5% extra returns on your next investment when friends sign up with your code</p>
+                  </div>
+                  <div className="text-center">
+                    <div className="w-16 h-16 rounded-full bg-[#D4AF37]/[0.1] border border-[#D4AF37]/[0.2] flex items-center justify-center mx-auto mb-4">
+                      <span className="text-2xl font-bold text-[#D4AF37]">∞</span>
+                    </div>
+                    <h3 className="text-white text-lg font-semibold mb-2">Unlimited Referrals</h3>
+                    <p className="text-[#555] text-sm">No limit on how many friends you can refer. Each referral gives you another 0.5% bonus</p>
+                  </div>
+                </div>
               </div>
             </AnimateOnScroll>
 
@@ -218,12 +203,11 @@ export default function ReferralsPage() {
             <AnimateOnScroll delay={0.25}>
               <div className="glass-gold p-8 md:p-10 max-w-4xl mx-auto">
                 <h2 className="text-white text-2xl font-semibold font-display mb-6 text-center">How It Works</h2>
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   {[
                     { step: "1", title: "Share Your Code", desc: "Give friends your unique referral code" },
-                    { step: "2", title: "They Sign Up", desc: "They register using your referral link" },
-                    { step: "3", title: "They Invest", desc: "When they invest, you earn commissions" },
-                    { step: "4", title: "Get Paid", desc: "Receive commissions weekly with their returns" }
+                    { step: "2", title: "They Invest", desc: "When they make their first investment, you get a 0.5% bonus" },
+                    { step: "3", title: "Apply Bonus", desc: "Use your 0.5% bonus on your next investment for extra returns" }
                   ].map((item, i) => (
                     <div key={i} className="text-center">
                       <div className="w-10 h-10 rounded-full bg-[#D4AF37] text-[#060608] font-bold text-sm flex items-center justify-center mx-auto mb-3">
@@ -241,9 +225,9 @@ export default function ReferralsPage() {
             <AnimateOnScroll delay={0.3}>
               <div className="mt-12 text-center">
                 <p className="text-[#444] text-[11px] leading-relaxed max-w-3xl mx-auto">
-                  Commissions are paid weekly based on your referrals' investment returns. 
-                  Referral codes are valid for 30 days. Commissions are calculated on net investment amounts 
-                  after any withdrawals. Full terms and conditions apply.
+                  0.5% bonuses are credited when your referred friends make their first investment. 
+                  Bonuses stack with multiple referrals. Referral codes are valid for 30 days. 
+                  Bonuses apply to your next investment only. Full terms and conditions apply.
                 </p>
               </div>
             </AnimateOnScroll>
