@@ -54,7 +54,7 @@ const currencies = [
 
 const paymentMethods = [
   { id: "moonpay", name: "MoonPay", desc: "Crypto, Apple Pay, Bank Transfer", icon: Wallet },
-  { id: "card", name: "Card Payment", desc: "Visa, Mastercard, Amex", icon: CreditCard },
+  { id: "card", name: "Card Payment", desc: "Currently Unavailable", icon: CreditCard, disabled: true },
 ];
 
 interface StoredInvestment {
@@ -273,6 +273,26 @@ export default function InvestPage() {
                 })}
               </div>
 
+              {/* Investment Guidelines */}
+              <div className="bg-[#D4AF37]/[0.04] border border-[#D4AF37]/[0.12] rounded-xl p-4 mb-5">
+                <div className="flex items-start gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-[#D4AF37]/[0.1] flex items-center justify-center flex-shrink-0">
+                    <Info size={14} className="text-[#D4AF37]" />
+                  </div>
+                  <div>
+                    <h4 className="text-white text-xs font-semibold mb-2">Investment Guidelines</h4>
+                    <div className="space-y-1.5">
+                      <p className="text-[#555] text-[10px] leading-relaxed">
+                        <span className="text-[#D4AF37] font-medium">Starter & Growth Packages:</span> Limited to 3 investment positions per package. Each investment must be a unique amount to ensure portfolio diversification.
+                      </p>
+                      <p className="text-[#555] text-[10px] leading-relaxed">
+                        <span className="text-[#D4AF37] font-medium">Premium Package:</span> Unlimited investment positions with flexible amounts for sophisticated portfolio management.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
               {/* Investment Form */}
               <div className="grid grid-cols-1 lg:grid-cols-5 gap-5">
                 {/* Left: Amount & Currency */}
@@ -368,9 +388,12 @@ export default function InvestPage() {
                     {paymentMethods.map((pm) => (
                       <button
                         key={pm.id}
-                        onClick={() => setSelectedPayment(pm.id)}
+                        onClick={() => !pm.disabled && setSelectedPayment(pm.id)}
+                        disabled={pm.disabled}
                         className={`flex items-center gap-3 p-3.5 rounded-xl border transition-all ${
-                          selectedPayment === pm.id
+                          pm.disabled
+                            ? "bg-white/[0.01] border-white/[0.02] text-[#333] cursor-not-allowed opacity-50"
+                            : selectedPayment === pm.id
                             ? "bg-[#D4AF37]/[0.06] border-[#D4AF37]/20 text-[#D4AF37]"
                             : "bg-white/[0.02] border-white/[0.06] text-[#666] hover:border-white/[0.1]"
                         }`}
