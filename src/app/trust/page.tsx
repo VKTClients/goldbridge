@@ -69,8 +69,9 @@ export default function TrustPage() {
   return (
     <div className="min-h-screen bg-[#060608] noise-overlay">
       <Navbar />
+      <MarketTicker />
       
-      <main className="pt-24 pb-20">
+      <main className="pt-[108px] pb-20">
         {/* Hero Section */}
         <section className="section-padding relative">
           <div className="aurora aurora-gold top-[10%] right-[10%] w-[200px] md:w-[400px] h-[150px] md:h-[300px] opacity-[0.06]" />
@@ -216,7 +217,6 @@ export default function TrustPage() {
       </main>
 
       <Footer />
-      <MarketTicker />
     </div>
   );
 }

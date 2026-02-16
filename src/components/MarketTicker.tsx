@@ -69,7 +69,7 @@ export default function MarketTicker() {
   const items = [...markets, ...markets];
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 w-full overflow-hidden bg-[#060608]/95 backdrop-blur-sm border-t border-white/[0.03] py-2.5 z-50">
+    <div className="fixed top-[72px] left-0 right-0 w-full overflow-hidden bg-[#060608]/95 backdrop-blur-sm border-b border-white/[0.03] py-2 z-40">
       <div className="ticker-track flex gap-8 whitespace-nowrap">
         {items.map((item, i) => (
           <div key={`${item.symbol}-${i}`} className="flex items-center gap-2 flex-shrink-0">

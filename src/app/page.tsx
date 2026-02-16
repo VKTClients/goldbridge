@@ -29,7 +29,7 @@ export default function Home() {
       <AuthModal />
       <Chatbot />
       <MarketTicker />
-      <main className="relative noise-overlay pb-16 mb-12">
+      <main className="relative noise-overlay pt-[36px]">
         <Navbar />
         <Hero />
         <LiveMarkets />
