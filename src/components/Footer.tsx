@@ -27,7 +27,7 @@ export default function Footer() {
             </div>
             <div className="flex flex-col">
               <span className="text-white/60 text-[11px] font-medium tracking-wide">Goldbridge Capital</span>
-              <span className="text-[#333] text-[9px] tracking-wider">Institutional Wealth Management</span>
+              <span className="text-[#333] text-[9px] tracking-wider">Est. 2005 · Institutional Wealth Management</span>
             </div>
           </div>
 
