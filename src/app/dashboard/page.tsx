@@ -105,7 +105,7 @@ function formatCurrency(amount: number) {
 }
 
 // Mini SVG line chart
-function PortfolioChart({ data }: { data: typeof chartData }) {
+function PortfolioChart({ data }: { data: { week: string; value: number }[] }) {
   const w = 500, h = 160, px = 40, py = 20;
   const maxVal = Math.max(...data.map(d => d.value));
   const minVal = Math.min(...data.map(d => d.value)) * 0.9;
