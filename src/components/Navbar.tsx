@@ -9,6 +9,7 @@ const navLinks = [
   { label: "Home", href: "/" },
   { label: "About Us", href: "/about" },
   { label: "Why Trust Us", href: "/trust" },
+  { label: "Referrals", href: "/referrals" },
   { label: "Packages", href: "/#pricing" },
 ];
 

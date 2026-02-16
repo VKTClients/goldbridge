@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { X, Eye, EyeOff, ArrowRight, User, Mail, Lock } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/context/AuthContext";
@@ -14,6 +14,17 @@ export default function AuthModal() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [referralCode, setReferralCode] = useState("");
+
+  // Load referral code from localStorage on mount
+  useEffect(() => {
+    const stored = localStorage.getItem("gb_referral_code");
+    if (stored) {
+      setReferralCode(stored);
+      // Clear it after loading
+      localStorage.removeItem("gb_referral_code");
+    }
+  }, []);
 
   const reset = () => {
     setName("");
@@ -21,6 +32,7 @@ export default function AuthModal() {
     setPassword("");
     setError("");
     setShowPassword(false);
+    // Don't reset referral code - keep it for the session
   };
 
   const switchMode = (m: "login" | "signup") => {
@@ -139,17 +151,33 @@ export default function AuthModal() {
               {/* Form */}
               <form onSubmit={handleSubmit} className="space-y-3">
                 {mode === "signup" && (
-                  <div className="relative">
-                    <User size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#444]" />
-                    <input
-                      type="text"
-                      placeholder="Full Name"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      autoComplete="name"
-                      className="w-full bg-white/[0.03] border border-white/[0.06] rounded-xl pl-9 pr-4 py-3 text-[16px] sm:text-sm text-white placeholder:text-[#444] focus:outline-none focus:border-[#D4AF37]/30 transition-colors"
-                    />
-                  </div>
+                  <>
+                    <div className="relative">
+                      <User size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#444]" />
+                      <input
+                        type="text"
+                        placeholder="Full Name"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        autoComplete="name"
+                        className="w-full bg-white/[0.03] border border-white/[0.06] rounded-xl pl-9 pr-4 py-3 text-[16px] sm:text-sm text-white placeholder:text-[#444] focus:outline-none focus:border-[#D4AF37]/30 transition-colors"
+                      />
+                    </div>
+                    
+                    {referralCode && (
+                      <div className="bg-[#D4AF37]/[0.05] border border-[#D4AF37]/[0.15] rounded-xl p-3">
+                        <div className="flex items-center gap-2">
+                          <div className="w-6 h-6 rounded-full bg-[#D4AF37]/10 flex items-center justify-center">
+                            <span className="text-[#D4AF37] text-[10px] font-bold">✓</span>
+                          </div>
+                          <div className="flex-1">
+                            <p className="text-[#D4AF37] text-xs font-medium">Referral Code Applied</p>
+                            <p className="text-[#555] text-[10px]">{referralCode}</p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </>
                 )}
 
                 <div className="relative">
