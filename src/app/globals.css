@@ -423,11 +423,25 @@
 
 /* ─── Mobile-specific fixes ─── */
 @media (max-width: 768px) {
+  /* Reduce blur intensity for better performance */
   .glass,
-  .glass-gold,
+  .glass-gold {
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+
   .glass-subtle {
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+
+  /* Disable hover transforms on mobile */
+  .glass:hover,
+  .glass-gold:hover,
+  .glass-subtle:hover,
+  .card:hover,
+  .market-card:hover {
+    transform: none;
   }
 
   .section-padding {
@@ -437,8 +451,21 @@
     padding-bottom: 3rem;
   }
 
+  /* Disable shimmer animation on mobile */
   .gold-shimmer::after {
     display: none;
+  }
+
+  /* Disable pulse animation on mobile */
+  .pulse-gold {
+    animation: none;
+    box-shadow: 0 0 8px rgba(212, 175, 55, 0.3);
+  }
+
+  /* Reduce aurora blur for performance */
+  .aurora {
+    filter: blur(80px);
+    opacity: 0.06;
   }
 
   /* Safe area insets for notched phones */
@@ -448,6 +475,24 @@
 
   .safe-top {
     padding-top: env(safe-area-inset-top, 0px);
+  }
+
+  /* Optimize transitions */
+  .glass,
+  .glass-gold,
+  .glass-subtle,
+  .card,
+  .market-card,
+  .tx-card {
+    transition-duration: 0.2s;
+  }
+
+  /* GPU acceleration for smooth scrolling */
+  .glass,
+  .glass-gold,
+  .card {
+    will-change: auto;
+    transform: translateZ(0);
   }
 }
 
@@ -479,10 +524,20 @@
 
 .ticker-track {
   animation: ticker-scroll 60s linear infinite;
+  will-change: transform;
 }
 
-.ticker-track:hover {
-  animation-play-state: paused;
+@media (hover: hover) {
+  .ticker-track:hover {
+    animation-play-state: paused;
+  }
+}
+
+/* Faster ticker on mobile for smoother feel */
+@media (max-width: 768px) {
+  .ticker-track {
+    animation-duration: 40s;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

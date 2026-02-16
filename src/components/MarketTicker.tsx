@@ -11,21 +11,21 @@ interface TickerItem {
 }
 
 const baseMarkets: TickerItem[] = [
-  { symbol: "BTC/USD", price: "97,842.50", change: "+2.14%", up: true },
-  { symbol: "ETH/USD", price: "3,456.80", change: "+1.87%", up: true },
-  { symbol: "XAU/USD", price: "2,684.30", change: "+0.92%", up: true },
-  { symbol: "S&P 500", price: "6,118.40", change: "+0.42%", up: true },
-  { symbol: "EUR/USD", price: "1.0842", change: "-0.15%", up: false },
-  { symbol: "GBP/USD", price: "1.2634", change: "+0.08%", up: true },
-  { symbol: "USD/ZAR", price: "18.42", change: "-0.34%", up: false },
-  { symbol: "NASDAQ", price: "19,842.60", change: "+0.68%", up: true },
-  { symbol: "DOW", price: "43,256.80", change: "+0.31%", up: true },
-  { symbol: "XAG/USD", price: "31.24", change: "+1.12%", up: true },
-  { symbol: "SOL/USD", price: "198.45", change: "+3.42%", up: true },
-  { symbol: "BNB/USD", price: "612.30", change: "-0.56%", up: false },
+  { symbol: "BTC/USD", price: "70,779.98", change: "+1.89%", up: true },
+  { symbol: "ETH/USD", price: "2,845.32", change: "+1.42%", up: true },
+  { symbol: "XAU/USD", price: "2,936.50", change: "+0.68%", up: true },
+  { symbol: "S&P 500", price: "6,114.63", change: "+0.24%", up: true },
+  { symbol: "EUR/USD", price: "1.0485", change: "-0.12%", up: false },
+  { symbol: "GBP/USD", price: "1.2568", change: "+0.15%", up: true },
+  { symbol: "USD/ZAR", price: "18.24", change: "-0.28%", up: false },
+  { symbol: "NASDAQ", price: "19,945.64", change: "+0.41%", up: true },
+  { symbol: "DOW", price: "44,546.08", change: "+0.18%", up: true },
+  { symbol: "XAG/USD", price: "32.85", change: "+0.94%", up: true },
+  { symbol: "SOL/USD", price: "178.42", change: "+2.86%", up: true },
+  { symbol: "BNB/USD", price: "658.45", change: "+0.72%", up: true },
   { symbol: "USD/NGN", price: "1,548.20", change: "+0.22%", up: true },
-  { symbol: "FTSE 100", price: "8,342.10", change: "+0.18%", up: true },
-  { symbol: "OIL/WTI", price: "78.42", change: "-0.82%", up: false },
+  { symbol: "FTSE 100", price: "8,732.46", change: "+0.32%", up: true },
+  { symbol: "OIL/WTI", price: "71.28", change: "-0.54%", up: false },
 ];
 
 function randomizePrice(item: TickerItem): TickerItem {

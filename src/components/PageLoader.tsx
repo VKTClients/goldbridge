@@ -7,7 +7,9 @@ export default function PageLoader() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 1800);
+    // Faster loading on mobile for better perceived performance
+    const isMobile = window.innerWidth < 768;
+    const timer = setTimeout(() => setLoading(false), isMobile ? 1000 : 1800);
     return () => clearTimeout(timer);
   }, []);
 

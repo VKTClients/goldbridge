@@ -2,7 +2,7 @@
 
 import { ArrowUpRight, Shield, TrendingUp } from "lucide-react";
 import { motion, useScroll, useTransform } from "framer-motion";
-import { useRef } from "react";
+import { useRef, useState, useEffect } from "react";
 import Marquee from "./Marquee";
 
 const partners = [
@@ -11,18 +11,25 @@ const partners = [
 
 export default function Hero() {
   const sectionRef = useRef(null);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    setIsMobile(window.innerWidth < 768);
+  }, []);
+
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ["start start", "end start"],
   });
 
-  const y1 = useTransform(scrollYProgress, [0, 1], [0, -40]);
-  const y2 = useTransform(scrollYProgress, [0, 1], [0, -20]);
-  const y3 = useTransform(scrollYProgress, [0, 1], [0, 30]);
-  const heroOpacity = useTransform(scrollYProgress, [0, 0.7], [1, 0]);
-  const heroScale = useTransform(scrollYProgress, [0, 0.7], [1, 0.95]);
-  const headlineY = useTransform(scrollYProgress, [0, 0.5], [0, -30]);
-  const statsY = useTransform(scrollYProgress, [0, 0.6], [0, 40]);
+  // Disable parallax effects on mobile for better performance
+  const y1 = useTransform(scrollYProgress, [0, 1], isMobile ? [0, 0] : [0, -40]);
+  const y2 = useTransform(scrollYProgress, [0, 1], isMobile ? [0, 0] : [0, -20]);
+  const y3 = useTransform(scrollYProgress, [0, 1], isMobile ? [0, 0] : [0, 30]);
+  const heroOpacity = useTransform(scrollYProgress, [0, 0.7], isMobile ? [1, 1] : [1, 0]);
+  const heroScale = useTransform(scrollYProgress, [0, 0.7], [1, 1]); // Disable scale on all devices
+  const headlineY = useTransform(scrollYProgress, [0, 0.5], isMobile ? [0, 0] : [0, -30]);
+  const statsY = useTransform(scrollYProgress, [0, 0.6], isMobile ? [0, 0] : [0, 40]);
 
   return (
     <section id="home" ref={sectionRef} className="relative min-h-screen overflow-hidden">

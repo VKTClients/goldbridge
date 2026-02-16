@@ -127,11 +127,11 @@ export default function Chatbot() {
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            initial={{ opacity: 0, y: 20, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 20, scale: 0.95 }}
-            transition={{ duration: 0.2 }}
-            className="fixed bottom-14 right-0 md:bottom-16 md:right-6 z-50 w-full md:w-[380px] h-[70vh] md:h-[500px] max-h-[600px] bg-[#0a0a0e] border border-white/[0.06] md:rounded-2xl rounded-t-2xl shadow-2xl shadow-black/50 flex flex-col overflow-hidden"
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 16 }}
+            transition={{ duration: 0.15, ease: "easeOut" }}
+            className="fixed bottom-14 right-0 md:bottom-16 md:right-6 z-50 w-full md:w-[380px] h-[60vh] md:h-[500px] max-h-[500px] bg-[#0a0a0e] border border-white/[0.06] md:rounded-2xl rounded-t-2xl shadow-2xl shadow-black/50 flex flex-col overflow-hidden"
           >
             {/* Header */}
             <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.06] bg-[#09090c]">

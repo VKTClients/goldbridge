@@ -7,17 +7,17 @@ const trustPoints = [
   {
     icon: Shield,
     title: "Bank-Grade Security",
-    description: "Your funds are protected with institutional-level encryption, multi-signature wallets, and cold storage protocols.",
+    description: "Your funds are protected with institutional-level encryption, multi-signature wallets, and cold storage protocols used by leading financial institutions.",
   },
   {
     icon: Eye,
     title: "Full Transparency",
-    description: "Track every trade, every return, and every movement of your capital in real-time through your personal dashboard.",
+    description: "Track every investment, every return, and every movement of your capital in real-time through your personal dashboard.",
   },
   {
     icon: Clock,
     title: "Consistent Weekly Payouts",
-    description: "Automated payouts every Monday without fail. No lock-up periods, no hidden delays — withdraw anytime.",
+    description: "Automated payouts every Monday without fail. No lock-up periods, no hidden delays — withdraw your returns anytime.",
   },
   {
     icon: Lock,
@@ -26,18 +26,18 @@ const trustPoints = [
   },
   {
     icon: Users,
-    title: "12,000+ Active Investors",
-    description: "Join a growing community of investors across Africa and beyond who trust GoldBridge with their capital.",
+    title: "Global Investor Community",
+    description: "Join thousands of investors across Africa, Europe, and beyond who trust GoldBridge with their capital growth.",
   },
   {
     icon: Award,
-    title: "Proven Track Record",
-    description: "Consistent performance since inception with a 98.2% client retention rate — our results speak for themselves.",
+    title: "25 Years of Excellence",
+    description: "Established in 2000, we have over two decades of experience delivering consistent returns through disciplined strategies.",
   },
   {
     icon: BarChart3,
-    title: "Disciplined Strategy",
-    description: "Our portfolio managers use quantitative models and risk-managed strategies across forex, crypto, indices, and metals.",
+    title: "AI-Driven Analysis",
+    description: "We combine industry experience with technology-assisted tools including AI-driven market analysis to identify opportunities.",
   },
   {
     icon: Headphones,
@@ -47,10 +47,10 @@ const trustPoints = [
 ];
 
 const stats = [
-  { value: "$2.4B+", label: "Assets Under Management" },
+  { value: "25+", label: "Years of Experience" },
   { value: "98.2%", label: "Client Retention Rate" },
-  { value: "12,000+", label: "Active Investors" },
-  { value: "52+", label: "Consecutive Weekly Payouts" },
+  { value: "40+", label: "Countries Served" },
+  { value: "$1.8B+", label: "Capital Deployed" },
 ];
 
 export default function WhyTrustUs() {
@@ -69,9 +69,10 @@ export default function WhyTrustUs() {
             <h2 className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 md:mb-5 tracking-tight">
               Why Trust <span className="gold-text">GoldBridge?</span>
             </h2>
-            <p className="text-[#555] text-sm md:text-base max-w-2xl mx-auto leading-relaxed px-2">
-              GoldBridge Capital was founded on three principles: clarity, discipline, and transparency.
-              We believe every investor deserves to know exactly how their money is working — and to see results, not promises.
+            <p className="text-[#555] text-sm md:text-base max-w-3xl mx-auto leading-relaxed px-2">
+              Since our establishment in 2000, we have focused on helping individuals grow their capital through 
+              carefully crafted strategies built on real-world business activity. We invest across international markets, 
+              deploying capital strategically across regions into growing online stores that generate daily sales.
             </p>
           </div>
         </AnimateOnScroll>
@@ -103,19 +104,48 @@ export default function WhyTrustUs() {
           ))}
         </div>
 
-        {/* About Paragraph */}
+        {/* Investment Focus */}
         <AnimateOnScroll delay={0.2}>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-10 md:mb-14">
+            <div className="glass p-6 md:p-8">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 rounded-xl bg-[#D4AF37]/[0.06] border border-[#D4AF37]/[0.1] flex items-center justify-center">
+                  <BarChart3 size={18} className="text-[#D4AF37]" />
+                </div>
+                <h3 className="text-white text-base md:text-lg font-display font-semibold">Global Markets</h3>
+              </div>
+              <p className="text-[#555] text-xs md:text-sm leading-relaxed">
+                Strategic investments across international markets. Our capital is deployed into growing e-commerce 
+                businesses that generate consistent daily sales across multiple regions.
+              </p>
+            </div>
+            <div className="glass p-6 md:p-8">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 rounded-xl bg-[#D4AF37]/[0.06] border border-[#D4AF37]/[0.1] flex items-center justify-center">
+                  <Shield size={18} className="text-[#D4AF37]" />
+                </div>
+                <h3 className="text-white text-base md:text-lg font-display font-semibold">Diversified Approach</h3>
+              </div>
+              <p className="text-[#555] text-xs md:text-sm leading-relaxed">
+                Multi-region deployment for optimal growth. Our investment approach is built upon strategic analysis, 
+                disciplined execution, and responsible risk management.
+              </p>
+            </div>
+          </div>
+        </AnimateOnScroll>
+
+        {/* About Paragraph */}
+        <AnimateOnScroll delay={0.25}>
           <div className="glass-subtle p-6 md:p-8 max-w-3xl mx-auto text-center">
-            <h3 className="text-white text-base md:text-lg font-display font-semibold mb-3">Our Mission</h3>
+            <h3 className="text-white text-base md:text-lg font-display font-semibold mb-3">Our Approach</h3>
             <p className="text-[#666] text-xs md:text-sm leading-relaxed mb-4">
-              GoldBridge Capital exists to democratise institutional-grade investing. We combine advanced quantitative
-              strategies with a human-first approach, ensuring every investor — from R1,000 to R1,000,000+ — receives
-              the same level of care, transparency, and performance.
+              Our investment approach is built upon strategic analysis, disciplined execution, and responsible risk management. 
+              We combine over two decades of industry experience with technology-assisted tools — including AI-driven market 
+              analysis — to identify high-potential opportunities.
             </p>
             <p className="text-[#555] text-xs leading-relaxed">
-              Our team of portfolio managers, risk analysts, and market strategists work around the clock across
-              global markets to deliver consistent, disciplined returns. We don&apos;t chase hype — we follow data,
-              manage risk, and let the results speak.
+              Every investment decision is backed by data, vetted by our research team, and executed with precision. 
+              We don&apos;t chase trends — we follow proven strategies that deliver consistent, measurable results.
             </p>
           </div>
         </AnimateOnScroll>

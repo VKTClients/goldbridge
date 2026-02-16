@@ -169,72 +169,57 @@ export default function Navbar() {
       <AnimatePresence>
         {mobileOpen && (
           <motion.div
-            className="lg:hidden bg-[#060608]/95 backdrop-blur-2xl border-t border-white/[0.03] overflow-hidden"
+            className="lg:hidden bg-[#060608]/98 backdrop-blur-xl border-t border-white/[0.03] overflow-hidden"
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ duration: 0.2, ease: "easeOut" }}
           >
             <div className="px-6 py-5 flex flex-col gap-0.5" style={{ paddingBottom: 'max(1.25rem, env(safe-area-inset-bottom))' }}>
-              {navLinks.map((link, i) => (
-                <motion.a
+              {navLinks.map((link) => (
+                <a
                   key={link.href}
                   href={link.href}
                   onClick={() => setMobileOpen(false)}
                   className="text-[#777] hover:text-white active:text-white transition-colors py-3.5 text-[15px] font-medium rounded-xl px-2 active:bg-white/[0.03]"
-                  initial={{ opacity: 0, x: -16 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: i * 0.05, duration: 0.3 }}
                 >
                   {link.label}
-                </motion.a>
+                </a>
               ))}
               <div className="divider-gold my-3" />
 
               {user ? (
                 <>
-                  <motion.a
+                  <a
                     href="/dashboard"
                     className="flex items-center gap-3 text-[#D4AF37] py-3.5 text-[15px] font-medium rounded-xl px-2 active:bg-[#D4AF37]/[0.06]"
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.2, duration: 0.3 }}
                     onClick={() => setMobileOpen(false)}
                   >
                     <LayoutDashboard size={17} />
                     Dashboard
-                  </motion.a>
-                  <motion.button
+                  </a>
+                  <button
                     onClick={() => { handleLogout(); setMobileOpen(false); }}
                     className="flex items-center gap-3 text-[#555] hover:text-red-400 active:text-red-400 py-3.5 text-[15px] font-medium transition-colors text-left rounded-xl px-2 active:bg-red-500/[0.04]"
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.25, duration: 0.3 }}
                   >
                     <LogOut size={17} />
                     Sign Out
-                  </motion.button>
+                  </button>
                 </>
               ) : (
                 <>
-                  <motion.button
+                  <button
                     onClick={() => { setShowAuthModal(true); setMobileOpen(false); }}
                     className="text-[#777] hover:text-white active:text-white py-3.5 text-[15px] font-medium text-left rounded-xl px-2 active:bg-white/[0.03]"
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.2, duration: 0.3 }}
                   >
                     Sign In
-                  </motion.button>
-                  <motion.button
+                  </button>
+                  <button
                     onClick={() => { setShowAuthModal(true); setMobileOpen(false); }}
                     className="btn-gold text-sm mt-3 text-center py-3.5"
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.25, duration: 0.3 }}
                   >
                     Get Started
-                  </motion.button>
+                  </button>
                 </>
               )}
             </div>
