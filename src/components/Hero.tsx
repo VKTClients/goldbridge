@@ -16,7 +16,10 @@ export default function Hero() {
   const { setShowAuthModal } = useAuth();
 
   useEffect(() => {
-    setIsMobile(window.innerWidth < 768);
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
   const { scrollYProgress } = useScroll({
@@ -28,7 +31,7 @@ export default function Hero() {
   const y1 = useTransform(scrollYProgress, [0, 1], isMobile ? [0, 0] : [0, -40]);
   const y2 = useTransform(scrollYProgress, [0, 1], isMobile ? [0, 0] : [0, -20]);
   const y3 = useTransform(scrollYProgress, [0, 1], isMobile ? [0, 0] : [0, 30]);
-  const heroOpacity = useTransform(scrollYProgress, [0, 0.7], isMobile ? [1, 1] : [1, 0]);
+  const heroOpacity = useTransform(scrollYProgress, [0, 0.7], [1, 1]); // Keep opacity at 1 for all devices
   const heroScale = useTransform(scrollYProgress, [0, 0.7], [1, 1]); // Disable scale on all devices
   const headlineY = useTransform(scrollYProgress, [0, 0.5], isMobile ? [0, 0] : [0, -30]);
   const statsY = useTransform(scrollYProgress, [0, 0.6], isMobile ? [0, 0] : [0, 40]);
