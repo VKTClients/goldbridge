@@ -563,8 +563,8 @@ export default function DashboardPage() {
                           </div>
                         </div>
                         <div className="text-right">
-                          <p className="text-white text-xs font-medium">{formatCurrency(inv.amount)}</p>
-                          <p className="text-emerald-400 text-[10px]">+{formatCurrency(inv.amount * inv.rate / 100)}/wk</p>
+                          <p className="text-white text-xs font-medium">{formatCurrency(inv.amountZAR)}</p>
+                          <p className="text-emerald-400 text-[10px]">+{formatCurrency(inv.amountZAR * inv.rate / 100)}/wk</p>
                         </div>
                       </div>
                     )) : (
