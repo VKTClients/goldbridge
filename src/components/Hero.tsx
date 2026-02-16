@@ -37,7 +37,7 @@ export default function Hero() {
   const statsY = useTransform(scrollYProgress, [0, 0.6], isMobile ? [0, 0] : [0, 40]);
 
   return (
-    <section id="home" ref={sectionRef} className="relative min-h-screen overflow-hidden">
+    <section id="home" ref={sectionRef} className="relative overflow-hidden pb-16 md:pb-24">
       {/* Background Effects */}
       <div className="absolute inset-0 grid-bg" />
       <motion.div

@@ -22,7 +22,7 @@ import Chatbot from "@/components/Chatbot";
 
 export default function Home() {
   return (
-    <>
+    <div className="min-h-screen bg-[#060608]">
       <PageLoader />
       <CursorGlow />
       <ScrollProgress />
@@ -30,7 +30,7 @@ export default function Home() {
       <Chatbot />
       <Navbar />
       <MarketTicker />
-      <main className="relative noise-overlay pt-[108px]">
+      <main className="relative pt-[108px]">
         <Hero />
         <LiveMarkets />
         <About />
@@ -46,6 +46,6 @@ export default function Home() {
         <CTA />
         <Footer />
       </main>
-    </>
+    </div>
   );
 }

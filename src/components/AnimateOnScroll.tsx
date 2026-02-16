@@ -1,6 +1,5 @@
 "use client";
 
-import { motion, useInView } from "framer-motion";
 import { useRef, useEffect, useState } from "react";
 
 interface AnimateOnScrollProps {
@@ -26,77 +25,66 @@ export default function AnimateOnScroll({
   blur = false,
   distance,
 }: AnimateOnScrollProps) {
-  const ref = useRef(null);
-  const [mounted, setMounted] = useState(false);
-  const [isMobile, setIsMobile] = useState(true); // Default to mobile to avoid blur flash
-  const isInView = useInView(ref, { once, margin: "-20px" });
+  const ref = useRef<HTMLDivElement>(null);
+  const [isVisible, setIsVisible] = useState(false);
+  const hasAnimated = useRef(false);
 
   useEffect(() => {
-    setMounted(true);
-    setIsMobile(window.innerWidth < 768);
-    
-    const handleResize = () => setIsMobile(window.innerWidth < 768);
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
+    const element = ref.current;
+    if (!element) return;
 
-  // On mobile or before mount, render without animations to prevent blur flash
-  if (!mounted || isMobile) {
-    return (
-      <div 
-        ref={ref} 
-        className={className}
-        style={{ opacity: isInView ? 1 : 0, transition: 'opacity 0.3s ease-out' }}
-      >
-        {children}
-      </div>
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          if (once) {
+            if (!hasAnimated.current) {
+              hasAnimated.current = true;
+              setIsVisible(true);
+            }
+          } else {
+            setIsVisible(true);
+          }
+        } else if (!once) {
+          setIsVisible(false);
+        }
+      },
+      { threshold: 0.05, rootMargin: "0px" }
     );
-  }
 
-  // Desktop animations
-  const dist = distance ?? 40;
+    observer.observe(element);
 
-  const directions = {
-    up: { y: dist, x: 0 },
-    down: { y: -dist, x: 0 },
-    left: { x: dist, y: 0 },
-    right: { x: -dist, y: 0 },
-    none: { x: 0, y: 0 },
+    return () => {
+      observer.disconnect();
+    };
+  }, [once]);
+
+  // Calculate transform based on direction
+  const dist = distance ?? 25;
+  const getTransform = () => {
+    if (isVisible) {
+      return scale ? "translateY(0) scale(1)" : "translateY(0)";
+    }
+    switch (direction) {
+      case "up": return scale ? `translateY(${dist}px) scale(0.98)` : `translateY(${dist}px)`;
+      case "down": return scale ? `translateY(-${dist}px) scale(0.98)` : `translateY(-${dist}px)`;
+      case "left": return scale ? `translateX(${dist}px) scale(0.98)` : `translateX(${dist}px)`;
+      case "right": return scale ? `translateX(-${dist}px) scale(0.98)` : `translateX(-${dist}px)`;
+      default: return scale ? "scale(0.98)" : "none";
+    }
   };
-
-  const initial: Record<string, number | string> = {
-    opacity: 0,
-    y: directions[direction].y,
-    x: directions[direction].x,
-  };
-  const visible: Record<string, number | string> = {
-    opacity: 1,
-    y: 0,
-    x: 0,
-  };
-
-  if (scale) {
-    initial.scale = 0.92;
-    visible.scale = 1;
-  }
-  if (blur) {
-    initial.filter = "blur(8px)";
-    visible.filter = "blur(0px)";
-  }
 
   return (
-    <motion.div
+    <div
       ref={ref}
       className={className}
-      initial={initial}
-      animate={isInView ? visible : initial}
-      transition={{
-        duration,
-        delay,
-        ease: [0.22, 1, 0.36, 1],
+      style={{
+        opacity: isVisible ? 1 : 0,
+        transform: getTransform(),
+        transition: `opacity ${duration}s cubic-bezier(0.22, 1, 0.36, 1) ${delay}s, transform ${duration}s cubic-bezier(0.22, 1, 0.36, 1) ${delay}s`,
+        willChange: "opacity, transform",
       }}
     >
       {children}
-    </motion.div>
+    </div>
   );
 }
