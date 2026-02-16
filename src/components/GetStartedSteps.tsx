@@ -60,7 +60,7 @@ export default function GetStartedSteps() {
               Start in <span className="gold-text">4 Simple Steps</span>
             </h2>
             <p className="text-[#555] text-sm md:text-base max-w-xl mx-auto leading-relaxed px-2">
-              From sign-up to your first payout in as little as 7 days.
+              From your first deposit to your first payout in as little as 7 days.
               No complexity, no jargon — just results.
             </p>
           </div>

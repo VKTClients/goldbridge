@@ -10,7 +10,7 @@ const navLinks = [
   { label: "Markets", href: "#markets" },
   { label: "Portfolio", href: "#invest" },
   { label: "Features", href: "#features" },
-  { label: "Pricing", href: "#pricing" },
+  { label: "Packages", href: "#pricing" },
 ];
 
 export default function Navbar() {

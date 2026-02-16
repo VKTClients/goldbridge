@@ -108,10 +108,9 @@ export default function Hero() {
           transition={{ delay: 0.5, duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
         >
           <h1 className="font-display text-4xl sm:text-5xl md:text-7xl lg:text-[86px] font-bold leading-[1.08] tracking-tight">
-            <span className="text-white">Where Wealth</span>
+            <span className="text-white">Your Capital,</span>
             <br />
-            <span className="text-white">Meets </span>
-            <span className="gold-text">Precision</span>
+            <span className="gold-text">Amplified</span>
           </h1>
         </motion.div>
 
@@ -122,9 +121,8 @@ export default function Hero() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.7, duration: 0.7 }}
         >
-          Goldbridge Capital delivers institutional-grade portfolio management
-          across crypto, indices, metals, and forex — engineered for
-          discerning investors who demand excellence.
+          From capital allocation to cycle completion, GoldBridge is designed
+          to be clear, disciplined and transparent.
         </motion.p>
 
         {/* CTA Buttons */}
@@ -134,7 +132,7 @@ export default function Hero() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.9, duration: 0.6 }}
         >
-          <a href="#pricing" className="btn-gold gap-2 px-8 py-3 text-sm w-full sm:w-auto justify-center">
+          <a href="/invest" className="btn-gold gap-2 px-8 py-3 text-sm w-full sm:w-auto justify-center">
             Begin Your Journey
             <ArrowUpRight size={14} />
           </a>

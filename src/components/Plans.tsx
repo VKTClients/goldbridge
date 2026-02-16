@@ -7,8 +7,8 @@ import TiltCard from "./TiltCard";
 const plans = [
   {
     name: "Starter",
-    investment: "R1,000 – R9,999",
-    returnRange: "20%",
+    investment: "R1,000 – R4,999",
+    returnRange: "15–20%",
     cycle: "7 Days",
     features: [
       "Weekly automated payouts",
@@ -21,8 +21,8 @@ const plans = [
   },
   {
     name: "Growth",
-    investment: "R10,000 – R99,999",
-    returnRange: "25%",
+    investment: "R5,000 – R9,999",
+    returnRange: "25–35%",
     cycle: "7 Days",
     features: [
       "Everything in Starter",
@@ -36,8 +36,8 @@ const plans = [
   },
   {
     name: "Premium",
-    investment: "R100,000+",
-    returnRange: "30%",
+    investment: "R10,000+",
+    returnRange: "40–50%",
     cycle: "7 Days",
     features: [
       "Everything in Growth",
@@ -129,7 +129,7 @@ export default function Plans() {
 
               {/* CTA */}
               <a
-                href="#faq"
+                href="/invest"
                 className={`w-full flex items-center justify-center gap-2 py-3 rounded-full text-xs font-semibold transition-all duration-300 ${
                   plan.popular
                     ? "btn-gold"
@@ -151,7 +151,7 @@ export default function Plans() {
           <p className="text-[#444] text-[11px] leading-relaxed text-center">
             <span className="text-[#D4AF37] font-semibold">Important Risk Disclosure:</span>{" "}
             All investments involve risk, including the possible loss of
-            principal. The projected returns of 20–30% per week are based on
+            principal. The projected returns of 15–50% per week are based on
             historical performance and are not guaranteed. Past performance does
             not guarantee future results. You should not invest money you cannot
             afford to lose. Please consult with a qualified financial advisor before

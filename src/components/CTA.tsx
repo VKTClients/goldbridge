@@ -31,7 +31,7 @@ export default function CTA() {
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 px-4 sm:px-0">
-              <a href="#pricing" className="btn-gold gap-2 px-8 py-3.5 sm:py-3 text-sm w-full sm:w-auto justify-center">
+              <a href="/invest" className="btn-gold gap-2 px-8 py-3.5 sm:py-3 text-sm w-full sm:w-auto justify-center">
                 Start Investing
                 <ArrowUpRight size={14} />
               </a>

@@ -12,29 +12,59 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
-// Mock data
+// Realistic mock investments
 const mockInvestments = [
-  { id: 1, plan: "Starter", amount: 5000, rate: 20, startDate: "2025-12-15", status: "Active", nextPayout: "Mon" },
-  { id: 2, plan: "Growth", amount: 25000, rate: 25, startDate: "2026-01-03", status: "Active", nextPayout: "Mon" },
-  { id: 3, plan: "Premium", amount: 150000, rate: 30, startDate: "2026-01-20", status: "Active", nextPayout: "Mon" },
+  { 
+    id: 1, 
+    plan: "Starter", 
+    amountZAR: 3500, 
+    rate: 17.5, 
+    date: "2026-01-10", 
+    status: "Active",
+    currency: "ZAR",
+    paymentMethod: "Card"
+  },
+  { 
+    id: 2, 
+    plan: "Growth", 
+    amountZAR: 7500, 
+    rate: 30, 
+    date: "2026-01-22", 
+    status: "Active",
+    currency: "ZAR",
+    paymentMethod: "MoonPay"
+  },
+  { 
+    id: 3, 
+    plan: "Premium", 
+    amountZAR: 15000, 
+    rate: 45, 
+    date: "2026-02-05", 
+    status: "Active",
+    currency: "ZAR",
+    paymentMethod: "Card"
+  },
 ];
 
 const mockTransactions = [
-  { id: 1, type: "deposit", amount: 150000, date: "2026-01-20", description: "Premium Plan Deposit" },
-  { id: 2, type: "return", amount: 6250, date: "2026-01-27", description: "Weekly Return — Growth" },
-  { id: 3, type: "return", amount: 1000, date: "2026-01-27", description: "Weekly Return — Starter" },
-  { id: 4, type: "deposit", amount: 25000, date: "2026-01-03", description: "Growth Plan Deposit" },
-  { id: 5, type: "return", amount: 45000, date: "2026-01-27", description: "Weekly Return — Premium" },
-  { id: 6, type: "deposit", amount: 5000, date: "2025-12-15", description: "Starter Plan Deposit" },
-  { id: 7, type: "withdrawal", amount: 10000, date: "2026-02-03", description: "Withdrawal to Bank" },
+  { id: 1, type: "deposit", amount: 15000, date: "2026-02-05", description: "Premium Plan Deposit" },
+  { id: 2, type: "return", amount: 6750, date: "2026-02-10", description: "Weekly Return — Premium" },
+  { id: 3, type: "return", amount: 2250, date: "2026-02-10", description: "Weekly Return — Growth" },
+  { id: 4, type: "deposit", amount: 7500, date: "2026-01-22", description: "Growth Plan Deposit" },
+  { id: 5, type: "return", amount: 2250, date: "2026-02-03", description: "Weekly Return — Growth" },
+  { id: 6, type: "return", amount: 612.50, date: "2026-02-03", description: "Weekly Return — Starter" },
+  { id: 7, type: "deposit", amount: 3500, date: "2026-01-10", description: "Starter Plan Deposit" },
+  { id: 8, type: "return", amount: 612.50, date: "2026-01-27", description: "Weekly Return — Starter" },
+  { id: 9, type: "return", amount: 612.50, date: "2026-01-20", description: "Weekly Return — Starter" },
+  { id: 10, type: "withdrawal", amount: 5000, date: "2026-01-15", description: "Withdrawal to Bank" },
 ];
 
 const mockNotifications = [
-  { id: 1, type: "payout", title: "Weekly payout processed", desc: "R52,250 credited to your account", time: "2h ago", read: false },
-  { id: 2, type: "security", title: "New login detected", desc: "Chrome on Windows • Pretoria, SA", time: "5h ago", read: false },
-  { id: 3, type: "system", title: "KYC verification pending", desc: "Complete verification for higher limits", time: "1d ago", read: true },
-  { id: 4, type: "referral", title: "New referral bonus", desc: "R500 bonus from john@email.com signup", time: "2d ago", read: true },
-  { id: 5, type: "payout", title: "Weekly payout processed", desc: "R52,250 credited to your account", time: "1w ago", read: true },
+  { id: 1, type: "payout", title: "Weekly payout processed", desc: "R9,612.50 credited to your account", time: "2h ago", read: false },
+  { id: 2, type: "security", title: "New login detected", desc: "Chrome on Windows • Johannesburg, SA", time: "5h ago", read: false },
+  { id: 3, type: "system", title: "Investment successful", desc: "Premium Plan R15,000 activated", time: "1d ago", read: true },
+  { id: 4, type: "payout", title: "Weekly payout processed", desc: "R2,862.50 credited to your account", time: "1w ago", read: true },
+  { id: 5, type: "system", title: "Welcome to GoldBridge", desc: "Your account is ready. Start investing today!", time: "2w ago", read: true },
 ];
 
 const mockGoals = [
@@ -43,15 +73,23 @@ const mockGoals = [
   { id: 3, name: "Retirement Fund", target: 2000000, current: 350000, icon: TrendingUp },
 ];
 
-// Portfolio growth chart data (6 weeks of cumulative value)
-const chartData = [
-  { week: "W1", value: 180000 },
-  { week: "W2", value: 232250 },
-  { week: "W3", value: 284500 },
-  { week: "W4", value: 336750 },
-  { week: "W5", value: 389000 },
-  { week: "W6", value: 441250 },
-];
+// Generate personal daily portfolio growth based on client investments
+function generateDailyGrowth(investments: typeof mockInvestments) {
+  const totalInvested = investments.reduce((s, i) => s + i.amountZAR, 0);
+  const dailyReturn = investments.reduce((s, i) => s + (i.amountZAR * i.rate / 100) / 7, 0);
+  const days = 14; // Show last 14 days
+  const data: { week: string; value: number }[] = [];
+  const today = new Date();
+  for (let d = days - 1; d >= 0; d--) {
+    const date = new Date(today);
+    date.setDate(date.getDate() - d);
+    const dayLabel = date.toLocaleDateString("en-ZA", { day: "numeric", month: "short" });
+    data.push({ week: dayLabel, value: Math.round(totalInvested + dailyReturn * (days - 1 - d)) });
+  }
+  return data;
+}
+
+// Chart data will be generated dynamically based on current investments
 
 type TabKey = "overview" | "investments" | "transactions" | "settings";
 
@@ -115,7 +153,7 @@ function PortfolioChart({ data }: { data: typeof chartData }) {
       {/* Line */}
       <path d={line} fill="none" stroke="url(#lineGrad)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
       {/* Dots */}
-      {pts.map((p, i) => (
+      {pts.map((p, i: number) => (
         <g key={i}>
           <circle cx={p.x} cy={p.y} r="3.5" fill="#060608" stroke="#D4AF37" strokeWidth="1.5" />
           <text x={p.x} y={p.y - 8} textAnchor="middle" fill="#D4AF37" fontSize="7" fontFamily="monospace" fontWeight="600">
@@ -128,12 +166,13 @@ function PortfolioChart({ data }: { data: typeof chartData }) {
 }
 
 export default function DashboardPage() {
-  const { user, isLoading, logout } = useAuth();
+  const { user, isLoading } = useAuth();
   const [activeTab, setActiveTab] = useState<TabKey>("overview");
   const [showNotifications, setShowNotifications] = useState(false);
   const [copiedRef, setCopiedRef] = useState(false);
   const [showSupport, setShowSupport] = useState(false);
   const [txFilter, setTxFilter] = useState<"all" | "deposit" | "return" | "withdrawal">("all");
+  const investments = mockInvestments;
 
   const referralCode = user ? `GB-${user.name.replace(/\s/g, "").toUpperCase().slice(0, 4)}-${Math.random().toString(36).slice(2, 6).toUpperCase()}` : "";
   const referralLink = `https://goldbridge.capital/ref/${referralCode}`;
@@ -144,6 +183,7 @@ export default function DashboardPage() {
     }
   }, [user, isLoading]);
 
+
   if (isLoading || !user) {
     return (
       <div className="min-h-screen bg-[#060608] flex items-center justify-center">
@@ -152,10 +192,11 @@ export default function DashboardPage() {
     );
   }
 
-  const totalInvested = mockInvestments.reduce((s, i) => s + i.amount, 0);
-  const weeklyReturn = mockInvestments.reduce((s, i) => s + (i.amount * i.rate) / 100, 0);
+  const totalInvested = investments.reduce((s, i) => s + i.amountZAR, 0);
+  const weeklyReturn = investments.reduce((s, i) => s + (i.amountZAR * i.rate) / 100, 0);
   const totalReturns = weeklyReturn * 6;
   const currentValue = totalInvested + totalReturns;
+  const chartData = generateDailyGrowth(investments);
   const unreadCount = mockNotifications.filter(n => !n.read).length;
   const filteredTx = txFilter === "all" ? mockTransactions : mockTransactions.filter(t => t.type === txFilter);
 
@@ -432,10 +473,10 @@ export default function DashboardPage() {
             >
               {/* Quick Actions */}
               <div className="grid grid-cols-3 gap-2 md:gap-3 mb-4">
-                <button className="flex items-center justify-center gap-2 bg-[#0a0a0e] border border-white/[0.04] rounded-xl p-3 hover:bg-white/[0.02] hover:border-[#D4AF37]/10 transition-all group">
+                <a href="/invest" className="flex items-center justify-center gap-2 bg-[#0a0a0e] border border-white/[0.04] rounded-xl p-3 hover:bg-white/[0.02] hover:border-[#D4AF37]/10 transition-all group">
                   <Wallet size={14} className="text-[#D4AF37] group-hover:scale-110 transition-transform" />
                   <span className="text-white text-[11px] font-medium">Deposit</span>
-                </button>
+                </a>
                 <button className="flex items-center justify-center gap-2 bg-[#0a0a0e] border border-white/[0.04] rounded-xl p-3 hover:bg-white/[0.02] hover:border-emerald-500/10 transition-all group">
                   <ArrowUpRight size={14} className="text-emerald-400 group-hover:scale-110 transition-transform" />
                   <span className="text-white text-[11px] font-medium">Withdraw</span>
@@ -475,12 +516,25 @@ export default function DashboardPage() {
               <div className="bg-[#0a0a0e] border border-white/[0.04] rounded-xl p-4 md:p-5 mb-4">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-white text-sm font-semibold">Portfolio Growth</h3>
-                  <div className="flex items-center gap-1.5 text-[10px] text-emerald-400">
-                    <TrendingUp size={11} />
-                    <span>+{((totalReturns / totalInvested) * 100).toFixed(1)}% total</span>
-                  </div>
+                  {totalInvested > 0 && (
+                    <div className="flex items-center gap-1.5 text-[10px] text-emerald-400">
+                      <TrendingUp size={11} />
+                      <span>+{((totalReturns / totalInvested) * 100).toFixed(1)}% total</span>
+                    </div>
+                  )}
                 </div>
-                <PortfolioChart data={chartData} />
+                {investments.length > 0 ? (
+                  <PortfolioChart data={chartData} />
+                ) : (
+                  <div className="text-center py-12">
+                    <TrendingUp size={40} className="text-[#222] mx-auto mb-3" />
+                    <p className="text-[#444] text-sm mb-2">No investments yet</p>
+                    <p className="text-[#333] text-xs mb-4">Start investing to see your portfolio growth</p>
+                    <a href="/invest" className="btn-gold text-[11px] font-semibold px-6 py-2.5 gap-1.5">
+                      Make Your First Investment
+                    </a>
+                  </div>
+                )}
               </div>
 
               {/* Two Column: Active Investments + Recent Transactions */}
@@ -493,7 +547,7 @@ export default function DashboardPage() {
                     </button>
                   </div>
                   <div className="space-y-2.5">
-                    {mockInvestments.map((inv) => (
+                    {investments.length > 0 ? investments.map((inv) => (
                       <div key={inv.id} className="flex items-center justify-between p-3 rounded-lg bg-white/[0.02] border border-white/[0.03]">
                         <div className="flex items-center gap-3">
                           <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-[10px] font-bold ${
@@ -513,7 +567,16 @@ export default function DashboardPage() {
                           <p className="text-emerald-400 text-[10px]">+{formatCurrency(inv.amount * inv.rate / 100)}/wk</p>
                         </div>
                       </div>
-                    ))}
+                    )) : (
+                      <div className="text-center py-8">
+                        <Wallet size={32} className="text-[#222] mx-auto mb-3" />
+                        <p className="text-[#444] text-sm mb-2">No active investments</p>
+                        <p className="text-[#333] text-xs mb-4">Start investing to see your portfolio here</p>
+                        <a href="/invest" className="btn-gold text-[11px] font-semibold px-6 py-2.5 gap-1.5">
+                          Make Your First Investment
+                        </a>
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -557,9 +620,9 @@ export default function DashboardPage() {
               <div className="bg-[#0a0a0e] border border-white/[0.04] rounded-xl p-4 md:p-5 mb-4">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-white text-sm font-semibold">Financial Goals</h3>
-                  <button className="text-[#D4AF37] text-[10px] flex items-center gap-1 hover:underline">
+                  <a href="/goals" className="text-[#D4AF37] text-[10px] flex items-center gap-1 hover:underline">
                     Add Goal <ChevronRight size={10} />
-                  </button>
+                  </a>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                   {mockGoals.map((goal) => {
@@ -661,7 +724,7 @@ export default function DashboardPage() {
                   <span>Start Date</span>
                   <span>Status</span>
                 </div>
-                {mockInvestments.map((inv) => (
+                {investments.length > 0 ? investments.map((inv) => (
                   <div key={inv.id} className="grid grid-cols-2 md:grid-cols-6 gap-2 md:gap-4 px-4 md:px-5 py-4 border-b border-white/[0.03] hover:bg-white/[0.01] transition-colors">
                     <div className="flex items-center gap-2">
                       <div className={`w-7 h-7 rounded-lg flex items-center justify-center text-[10px] font-bold ${
@@ -673,17 +736,26 @@ export default function DashboardPage() {
                       </div>
                       <span className="text-white text-xs font-medium">{inv.plan}</span>
                     </div>
-                    <span className="text-white text-xs">{formatCurrency(inv.amount)}</span>
+                    <span className="text-white text-xs">{formatCurrency(inv.amountZAR)}</span>
                     <span className="text-[#D4AF37] text-xs hidden md:block">{inv.rate}%/wk</span>
-                    <span className="text-emerald-400 text-xs hidden md:block">{formatCurrency(inv.amount * inv.rate / 100)}</span>
-                    <span className="text-[#555] text-xs hidden md:block">{inv.startDate}</span>
+                    <span className="text-emerald-400 text-xs hidden md:block">{formatCurrency(inv.amountZAR * inv.rate / 100)}</span>
+                    <span className="text-[#555] text-xs hidden md:block">{inv.date}</span>
                     <div className="flex justify-end md:justify-start">
                       <span className="text-emerald-400 text-[10px] bg-emerald-500/[0.08] px-2 py-0.5 rounded-full font-medium">
                         {inv.status}
                       </span>
                     </div>
                   </div>
-                ))}
+                )) : (
+                  <div className="text-center py-12">
+                    <Wallet size={40} className="text-[#222] mx-auto mb-3" />
+                    <p className="text-[#444] text-sm mb-2">No investments yet</p>
+                    <p className="text-[#333] text-xs mb-4">Start investing to see your portfolio here</p>
+                    <a href="/invest" className="btn-gold text-[11px] font-semibold px-6 py-2.5 gap-1.5">
+                      Make Your First Investment
+                    </a>
+                  </div>
+                )}
               </div>
 
               <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mt-4">
@@ -697,7 +769,7 @@ export default function DashboardPage() {
                 </div>
                 <div className="bg-[#0a0a0e] border border-white/[0.04] rounded-xl p-4 col-span-2 md:col-span-1">
                   <p className="text-[#444] text-[10px] mb-1">Active Plans</p>
-                  <p className="text-white text-lg font-semibold font-display">{mockInvestments.length}</p>
+                  <p className="text-white text-lg font-semibold font-display">{investments.length}</p>
                 </div>
               </div>
             </motion.div>

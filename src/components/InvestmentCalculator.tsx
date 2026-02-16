@@ -2,61 +2,45 @@
 
 import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
-import { Calculator, TrendingUp, ArrowUpRight } from "lucide-react";
+import { Calculator, TrendingUp, ArrowUpRight, ChevronDown } from "lucide-react";
 import AnimateOnScroll from "./AnimateOnScroll";
 import CounterNumber from "./CounterNumber";
 
 const tiers = [
-  { name: "Starter", min: 1000, max: 9999, rate: 0.20, label: "20% /week" },
-  { name: "Growth", min: 10000, max: 99999, rate: 0.25, label: "25% /week" },
-  { name: "Premium", min: 100000, max: 1000000, rate: 0.30, label: "30% /week" },
+  { name: "Starter", min: 1000, max: 4999, rate: 0.175, label: "15–20% /week" },
+  { name: "Growth", min: 5000, max: 9999, rate: 0.30, label: "25–35% /week" },
+  { name: "Premium", min: 10000, max: 1000000, rate: 0.45, label: "40–50% /week" },
 ];
 
-const durations = [
-  { weeks: 4, label: "1 Month" },
-  { weeks: 12, label: "3 Months" },
-  { weeks: 26, label: "6 Months" },
-  { weeks: 52, label: "1 Year" },
+const currencies = [
+  { code: "ZAR", symbol: "R", rate: 1, name: "South African Rand" },
+  { code: "USD", symbol: "$", rate: 0.054, name: "US Dollar" },
+  { code: "EUR", symbol: "€", rate: 0.050, name: "Euro" },
+  { code: "GBP", symbol: "£", rate: 0.043, name: "British Pound" },
+  { code: "NGN", symbol: "₦", rate: 83.64, name: "Nigerian Naira" },
+  { code: "KES", symbol: "KSh", rate: 6.98, name: "Kenyan Shilling" },
+  { code: "BWP", symbol: "P", rate: 0.74, name: "Botswana Pula" },
 ];
 
 export default function InvestmentCalculator() {
   const [amount, setAmount] = useState(10000);
   const [selectedTier, setSelectedTier] = useState(1);
-  const [selectedDuration, setSelectedDuration] = useState(1);
+  const [selectedCurrency, setSelectedCurrency] = useState(0);
 
   const tier = tiers[selectedTier];
-  const duration = durations[selectedDuration];
+  const currency = currencies[selectedCurrency];
 
   // Clamp amount to tier range
   const clampedAmount = Math.max(tier.min, Math.min(tier.max, amount));
 
   const projections = useMemo(() => {
-    const weeklyReturn = clampedAmount * tier.rate;
-    const totalReturn = weeklyReturn * duration.weeks;
-    const totalValue = clampedAmount + totalReturn;
-    const roi = (totalReturn / clampedAmount) * 100;
+    const weeklyReturnZAR = clampedAmount * tier.rate;
+    const weeklyReturn = weeklyReturnZAR * currency.rate;
+    const amountInCurrency = clampedAmount * currency.rate;
 
-    // Build weekly growth data for the mini chart
-    const chartData: number[] = [];
-    let cumulative = clampedAmount;
-    for (let w = 0; w <= duration.weeks; w++) {
-      chartData.push(cumulative);
-      cumulative += weeklyReturn;
-    }
+    return { weeklyReturn, amountInCurrency };
+  }, [clampedAmount, tier.rate, currency.rate]);
 
-    return { weeklyReturn, totalReturn, totalValue, roi, chartData };
-  }, [clampedAmount, tier.rate, duration.weeks]);
-
-  // Mini growth chart
-  const chartH = 120;
-  const chartW = 400;
-  const minVal = projections.chartData[0];
-  const maxVal = projections.chartData[projections.chartData.length - 1];
-  const range = maxVal - minVal || 1;
-  const step = chartW / (projections.chartData.length - 1);
-  const points = projections.chartData
-    .map((v, i) => `${i * step},${chartH - ((v - minVal) / range) * (chartH - 10)}`)
-    .join(" ");
 
   return (
     <section id="calculator" className="section-padding relative overflow-hidden">
@@ -142,25 +126,24 @@ export default function InvestmentCalculator() {
                 </div>
               </div>
 
-              {/* Duration Selection */}
+              {/* Currency Selection */}
               <div>
                 <label className="text-[#555] text-[10px] uppercase tracking-[0.2em] mb-3 block">
-                  Time Period
+                  Display Currency
                 </label>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                  {durations.map((d, i) => (
-                    <button
-                      key={d.label}
-                      onClick={() => setSelectedDuration(i)}
-                      className={`py-2.5 px-2 rounded-xl text-center transition-all duration-300 border ${
-                        selectedDuration === i
-                          ? "bg-[#D4AF37]/10 border-[#D4AF37]/25 text-[#D4AF37]"
-                          : "bg-white/[0.02] border-white/[0.06] text-[#666] hover:border-white/[0.1]"
-                      }`}
-                    >
-                      <span className="text-[11px] font-medium">{d.label}</span>
-                    </button>
-                  ))}
+                <div className="relative">
+                  <select
+                    value={selectedCurrency}
+                    onChange={(e) => setSelectedCurrency(Number(e.target.value))}
+                    className="w-full bg-white/[0.03] border border-white/[0.06] rounded-xl px-4 py-3 text-white text-sm outline-none focus:border-[#D4AF37]/30 transition-colors appearance-none cursor-pointer"
+                  >
+                    {currencies.map((c, i) => (
+                      <option key={c.code} value={i} className="bg-[#0a0a0e] text-white">
+                        {c.code} ({c.symbol}) - {c.name}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown size={16} className="absolute right-4 top-1/2 -translate-y-1/2 text-[#555] pointer-events-none" />
                 </div>
               </div>
 
@@ -173,126 +156,70 @@ export default function InvestmentCalculator() {
 
             {/* Right — Results */}
             <div className="lg:col-span-3 glass-gold p-5 md:p-7 gold-shimmer">
-              {/* Top stats */}
-              <div className="grid grid-cols-2 gap-4 mb-6">
-                <div>
-                  <p className="text-[#555] text-[10px] uppercase tracking-[0.2em] mb-1.5">Weekly Return</p>
-                  <motion.p
-                    key={projections.weeklyReturn}
-                    initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="text-emerald-400 text-2xl md:text-3xl font-bold font-display"
-                  >
-                    +R{projections.weeklyReturn.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                  </motion.p>
-                  <p className="text-[#444] text-[10px] mt-0.5">Every 7 days</p>
-                </div>
-                <div>
-                  <p className="text-[#555] text-[10px] uppercase tracking-[0.2em] mb-1.5">Total ROI</p>
-                  <motion.p
-                    key={projections.roi}
-                    initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="text-[#D4AF37] text-2xl md:text-3xl font-bold font-display"
-                  >
-                    {projections.roi.toFixed(0)}%
-                  </motion.p>
-                  <p className="text-[#444] text-[10px] mt-0.5">Over {duration.label.toLowerCase()}</p>
-                </div>
-              </div>
-
-              {/* Growth Chart */}
-              <div className="glass-subtle p-4 rounded-xl mb-6">
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-2">
-                    <TrendingUp size={12} className="text-[#D4AF37]" />
-                    <span className="text-[#888] text-[10px] uppercase tracking-wider">Projected Growth</span>
-                  </div>
-                  <span className="text-[#D4AF37] text-[10px] font-medium">{duration.weeks} weeks</span>
-                </div>
-                <svg
-                  viewBox={`0 0 ${chartW} ${chartH}`}
-                  className="w-full h-[100px] md:h-[120px]"
-                  preserveAspectRatio="none"
+              {/* Weekly Return Display */}
+              <div className="text-center mb-6">
+                <p className="text-[#555] text-[10px] uppercase tracking-[0.2em] mb-3">Weekly Return</p>
+                <motion.p
+                  key={projections.weeklyReturn}
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="text-emerald-400 text-4xl md:text-5xl font-bold font-display mb-2"
                 >
-                  <defs>
-                    <linearGradient id="calcGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="#D4AF37" stopOpacity="0.25" />
-                      <stop offset="100%" stopColor="#D4AF37" stopOpacity="0" />
-                    </linearGradient>
-                  </defs>
-                  {/* Grid lines */}
-                  {[0.25, 0.5, 0.75].map((pct) => (
-                    <line
-                      key={pct}
-                      x1="0"
-                      y1={chartH * pct}
-                      x2={chartW}
-                      y2={chartH * pct}
-                      stroke="rgba(255,255,255,0.03)"
-                      strokeWidth="1"
-                    />
-                  ))}
-                  <polygon
-                    points={`0,${chartH} ${points} ${chartW},${chartH}`}
-                    fill="url(#calcGrad)"
-                  />
-                  <polyline
-                    points={points}
-                    fill="none"
-                    stroke="#D4AF37"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                  {/* End dot */}
-                  {projections.chartData.length > 0 && (
-                    <circle
-                      cx={chartW}
-                      cy={chartH - ((projections.chartData[projections.chartData.length - 1] - minVal) / range) * (chartH - 10)}
-                      r="4"
-                      fill="#D4AF37"
-                      className="animate-pulse"
-                    />
-                  )}
-                </svg>
+                  +{currency.symbol}{projections.weeklyReturn.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </motion.p>
+                <p className="text-[#444] text-xs">Every 7 days · {tier.label}</p>
               </div>
 
-              {/* Bottom summary */}
-              <div className="grid grid-cols-3 gap-3">
-                <div className="glass-subtle p-3 rounded-xl text-center">
-                  <p className="text-[#555] text-[9px] uppercase tracking-wider mb-1">Invested</p>
-                  <p className="text-white text-sm md:text-base font-bold font-display">
-                    R{clampedAmount.toLocaleString()}
+              {/* Investment Summary */}
+              <div className="grid grid-cols-2 gap-4 mb-6">
+                <div className="glass-subtle p-4 rounded-xl text-center">
+                  <p className="text-[#555] text-[10px] uppercase tracking-[0.2em] mb-1.5">Investment</p>
+                  <p className="text-white text-lg font-bold font-display">
+                    {currency.symbol}{projections.amountInCurrency.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </p>
+                  <p className="text-[#444] text-[9px] mt-0.5">{currency.code}</p>
                 </div>
-                <div className="glass-subtle p-3 rounded-xl text-center">
-                  <p className="text-[#555] text-[9px] uppercase tracking-wider mb-1">Total Return</p>
-                  <motion.p
-                    key={projections.totalReturn}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    className="text-emerald-400 text-sm md:text-base font-bold font-display"
-                  >
-                    +R{projections.totalReturn.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                  </motion.p>
+                <div className="glass-subtle p-4 rounded-xl text-center">
+                  <p className="text-[#555] text-[10px] uppercase tracking-[0.2em] mb-1.5">Weekly ROI</p>
+                  <p className="text-[#D4AF37] text-lg font-bold font-display">
+                    {(tier.rate * 100).toFixed(0)}%
+                  </p>
+                  <p className="text-[#444] text-[9px] mt-0.5">{tier.name} Tier</p>
                 </div>
-                <div className="glass-subtle p-3 rounded-xl text-center">
-                  <p className="text-[#555] text-[9px] uppercase tracking-wider mb-1">Total Value</p>
-                  <motion.p
-                    key={projections.totalValue}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    className="text-[#D4AF37] text-sm md:text-base font-bold font-display"
-                  >
-                    R{projections.totalValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                  </motion.p>
+              </div>
+
+              {/* Breakdown */}
+              <div className="glass-subtle p-5 rounded-xl">
+                <div className="flex items-center gap-2 mb-4">
+                  <TrendingUp size={14} className="text-[#D4AF37]" />
+                  <span className="text-[#888] text-xs uppercase tracking-wider">Weekly Breakdown</span>
+                </div>
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center">
+                    <span className="text-[#555] text-xs">Your Investment</span>
+                    <span className="text-white text-sm font-semibold">
+                      {currency.symbol}{projections.amountInCurrency.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-[#555] text-xs">Weekly Return ({(tier.rate * 100).toFixed(0)}%)</span>
+                    <span className="text-emerald-400 text-sm font-semibold">
+                      +{currency.symbol}{projections.weeklyReturn.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </span>
+                  </div>
+                  <div className="h-px bg-white/[0.06] my-2"></div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-[#888] text-xs font-medium">After 1 Week</span>
+                    <span className="text-[#D4AF37] text-base font-bold">
+                      {currency.symbol}{(projections.amountInCurrency + projections.weeklyReturn).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </span>
+                  </div>
                 </div>
               </div>
 
               {/* CTA */}
               <div className="mt-6 flex flex-col sm:flex-row items-center gap-3">
-                <a href="#pricing" className="btn-gold gap-2 px-6 py-3 text-sm w-full sm:w-auto justify-center">
+                <a href="/invest" className="btn-gold gap-2 px-6 py-3 text-sm w-full sm:w-auto justify-center">
                   Start With R{clampedAmount.toLocaleString()}
                   <ArrowUpRight size={14} />
                 </a>
