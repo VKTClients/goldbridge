@@ -28,9 +28,9 @@ export default function Home() {
       <ScrollProgress />
       <AuthModal />
       <Chatbot />
+      <Navbar />
       <MarketTicker />
-      <main className="relative noise-overlay pt-[36px]">
-        <Navbar />
+      <main className="relative noise-overlay pt-[108px]">
         <Hero />
         <LiveMarkets />
         <About />
