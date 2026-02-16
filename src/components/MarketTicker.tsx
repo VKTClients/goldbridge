@@ -2,31 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { TrendingUp, TrendingDown } from "lucide-react";
+import { fetchAllMarketData, fallbackMarketData, MarketData } from "@/lib/alphaVantage";
 
-interface TickerItem {
-  symbol: string;
-  price: string;
-  change: string;
-  up: boolean;
-}
-
-const baseMarkets: TickerItem[] = [
-  { symbol: "BTC/USD", price: "70,779.98", change: "+1.89%", up: true },
-  { symbol: "ETH/USD", price: "2,845.32", change: "+1.42%", up: true },
-  { symbol: "XAU/USD", price: "2,936.50", change: "+0.68%", up: true },
-  { symbol: "S&P 500", price: "6,114.63", change: "+0.24%", up: true },
-  { symbol: "EUR/USD", price: "1.0485", change: "-0.12%", up: false },
-  { symbol: "GBP/USD", price: "1.2568", change: "+0.15%", up: true },
-  { symbol: "USD/ZAR", price: "18.24", change: "-0.28%", up: false },
-  { symbol: "NASDAQ", price: "19,945.64", change: "+0.41%", up: true },
-  { symbol: "DOW", price: "44,546.08", change: "+0.18%", up: true },
-  { symbol: "XAG/USD", price: "32.85", change: "+0.94%", up: true },
-  { symbol: "SOL/USD", price: "178.42", change: "+2.86%", up: true },
-  { symbol: "BNB/USD", price: "658.45", change: "+0.72%", up: true },
-  { symbol: "USD/NGN", price: "1,548.20", change: "+0.22%", up: true },
-  { symbol: "FTSE 100", price: "8,732.46", change: "+0.32%", up: true },
-  { symbol: "OIL/WTI", price: "71.28", change: "-0.54%", up: false },
-];
+type TickerItem = MarketData;
 
 function randomizePrice(item: TickerItem): TickerItem {
   const priceNum = parseFloat(item.price.replace(/,/g, ""));
@@ -51,13 +29,40 @@ function randomizePrice(item: TickerItem): TickerItem {
 }
 
 export default function MarketTicker() {
-  const [markets, setMarkets] = useState<TickerItem[]>(baseMarkets);
+  const [markets, setMarkets] = useState<TickerItem[]>(fallbackMarketData);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    // Fetch real data on mount
+    const fetchInitialData = async () => {
+      try {
+        const realData = await fetchAllMarketData();
+        if (realData.length > 0) {
+          setMarkets(realData);
+        }
+      } catch (error) {
+        console.error('Failed to fetch market data, using fallback:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchInitialData();
+
+    // Update data every 5 minutes (Alpha Vantage has rate limits)
     const interval = setInterval(() => {
+      fetchInitialData();
+    }, 300000);
+
+    // Small price fluctuations for visual effect
+    const fluctuationInterval = setInterval(() => {
       setMarkets((prev) => prev.map(randomizePrice));
     }, 3000);
-    return () => clearInterval(interval);
+
+    return () => {
+      clearInterval(interval);
+      clearInterval(fluctuationInterval);
+    };
   }, []);
 
   // Duplicate for seamless loop
