@@ -1,6 +1,7 @@
 "use client";
 
 import AnimateOnScroll from "./AnimateOnScroll";
+import Image from "next/image";
 
 export default function Footer() {
   return (
@@ -22,9 +23,11 @@ export default function Footer() {
         <div className="flex flex-col md:flex-row items-center justify-between gap-5 md:gap-6">
           {/* Logo */}
           <div className="flex items-center gap-3">
-            <img 
+            <Image 
               src="/logo.png" 
               alt="Goldbridge Capital" 
+              width={90}
+              height={24}
               className="h-6 w-auto object-contain"
             />
             <div className="flex flex-col">

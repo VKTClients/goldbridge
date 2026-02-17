@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import Image from "next/image";
 
 export default function PageLoader() {
   const [loading, setLoading] = useState(true);
@@ -23,14 +24,20 @@ export default function PageLoader() {
         >
           <div className="flex flex-col items-center gap-6">
             {/* Logo */}
-            <motion.img
-              src="/logo.png"
-              alt="Goldbridge Capital"
+            <motion.div
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ duration: 0.5 }}
-              className="h-12 w-auto object-contain"
-            />
+            >
+              <Image
+                src="/logo.png"
+                alt="Goldbridge Capital"
+                width={144}
+                height={48}
+                className="h-12 w-auto object-contain"
+                priority
+              />
+            </motion.div>
 
             {/* Loading bar */}
             <div className="w-48 h-[2px] bg-white/[0.06] rounded-full overflow-hidden">
