@@ -524,7 +524,7 @@
 }
 
 .ticker-track {
-  animation: ticker-scroll 45s linear infinite;
+  animation: ticker-scroll 60s linear infinite;
   will-change: transform;
   display: flex;
   width: max-content;
@@ -539,7 +539,7 @@
 /* Faster ticker on mobile for smoother feel */
 @media (max-width: 768px) {
   .ticker-track {
-    animation-duration: 30s;
+    animation-duration: 45s;
   }
 }
 
