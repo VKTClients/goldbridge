@@ -20,10 +20,12 @@ import ScrollProgress from "@/components/ScrollProgress";
 import AuthModal from "@/components/AuthModal";
 import Chatbot from "@/components/Chatbot";
 import Newsletter from "@/components/Newsletter";
+import HashScroller from "@/components/HashScroller";
 
 export default function Home() {
   return (
     <div className="min-h-screen bg-[#060608]">
+      <HashScroller />
       <PageLoader />
       <CursorGlow />
       <ScrollProgress />

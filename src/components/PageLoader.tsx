@@ -24,7 +24,7 @@ export default function PageLoader() {
           <div className="flex flex-col items-center gap-6">
             {/* Logo */}
             <motion.img
-              src="/Image-removebg-preview.png"
+              src="/logo.png"
               alt="Goldbridge Capital"
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}

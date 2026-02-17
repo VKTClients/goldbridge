@@ -524,7 +524,7 @@
 }
 
 .ticker-track {
-  animation: ticker-scroll 60s linear infinite;
+  animation: ticker-scroll 120s linear infinite;
   will-change: transform;
   display: flex;
   width: max-content;
@@ -536,10 +536,9 @@
   }
 }
 
-/* Faster ticker on mobile for smoother feel */
 @media (max-width: 768px) {
   .ticker-track {
-    animation-duration: 45s;
+    animation-duration: 90s;
   }
 }
 

@@ -46,6 +46,19 @@ export default function Navbar() {
     window.location.href = "/";
   };
 
+  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    // Handle hash links like /#pricing from other pages
+    if (href.startsWith("/#")) {
+      const hash = href.substring(1); // e.g. "#pricing"
+      if (window.location.pathname !== "/") {
+        // On a different page — navigate to homepage with hash
+        e.preventDefault();
+        window.location.href = href;
+      }
+      // On homepage — default anchor behavior handles it
+    }
+  };
+
   return (
     <nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-700 ${
@@ -58,7 +71,7 @@ export default function Navbar() {
         {/* Logo */}
         <a href="/" className="flex items-center gap-3 group">
           <img 
-            src="/Image-removebg-preview.png" 
+            src="/logo.png" 
             alt="Goldbridge Capital" 
             className="h-8 w-auto object-contain"
           />
@@ -78,6 +91,7 @@ export default function Navbar() {
             <a
               key={link.href}
               href={link.href}
+              onClick={(e) => handleNavClick(e, link.href)}
               className="px-4 py-1.5 text-[12px] text-[#777] hover:text-white rounded-full hover:bg-white/[0.05] transition-all duration-300 font-medium tracking-wide"
             >
               {link.label}
@@ -199,7 +213,7 @@ export default function Navbar() {
                 <a
                   key={link.href}
                   href={link.href}
-                  onClick={() => setMobileOpen(false)}
+                  onClick={(e) => { handleNavClick(e, link.href); setMobileOpen(false); }}
                   className="text-[#777] hover:text-white active:text-white transition-colors py-3.5 text-[15px] font-medium rounded-xl px-2 active:bg-white/[0.03]"
                 >
                   {link.label}

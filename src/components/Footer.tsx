@@ -23,7 +23,7 @@ export default function Footer() {
           {/* Logo */}
           <div className="flex items-center gap-3">
             <img 
-              src="/Image-removebg-preview.png" 
+              src="/logo.png" 
               alt="Goldbridge Capital" 
               className="h-6 w-auto object-contain"
             />
