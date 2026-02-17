@@ -23,14 +23,14 @@ export default function PageLoader() {
         >
           <div className="flex flex-col items-center gap-6">
             {/* Logo */}
-            <motion.div
+            <motion.img
+              src="/Image-removebg-preview.png"
+              alt="Goldbridge Capital"
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ duration: 0.5 }}
-              className="w-14 h-14 rounded-full bg-gradient-to-br from-[#D4AF37] via-[#C9A84C] to-[#B8942E] flex items-center justify-center shadow-lg shadow-[#D4AF37]/15"
-            >
-              <span className="text-[#060608] font-bold text-xl">G</span>
-            </motion.div>
+              className="h-12 w-auto object-contain"
+            />
 
             {/* Loading bar */}
             <div className="w-48 h-[2px] bg-white/[0.06] rounded-full overflow-hidden">

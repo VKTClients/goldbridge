@@ -22,9 +22,11 @@ export default function Footer() {
         <div className="flex flex-col md:flex-row items-center justify-between gap-5 md:gap-6">
           {/* Logo */}
           <div className="flex items-center gap-3">
-            <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#D4AF37] via-[#C9A84C] to-[#B8942E] flex items-center justify-center">
-              <span className="text-[#060608] font-bold text-[10px]">G</span>
-            </div>
+            <img 
+              src="/Image-removebg-preview.png" 
+              alt="Goldbridge Capital" 
+              className="h-6 w-auto object-contain"
+            />
             <div className="flex flex-col">
               <span className="text-white/60 text-[11px] font-medium tracking-wide">Goldbridge Capital</span>
               <span className="text-[#333] text-[9px] tracking-wider">Est. 2005 · Institutional Wealth Management</span>
@@ -36,8 +38,8 @@ export default function Footer() {
             <a href="#home" className="text-[#444] text-xs sm:text-[11px] hover:text-[#D4AF37] active:text-[#D4AF37] transition-colors py-1">Home</a>
             <a href="#markets" className="text-[#444] text-xs sm:text-[11px] hover:text-[#D4AF37] active:text-[#D4AF37] transition-colors py-1">Markets</a>
             <a href="#pricing" className="text-[#444] text-xs sm:text-[11px] hover:text-[#D4AF37] active:text-[#D4AF37] transition-colors py-1">Pricing</a>
-            <a href="#" className="text-[#444] text-xs sm:text-[11px] hover:text-[#D4AF37] active:text-[#D4AF37] transition-colors py-1">Privacy</a>
-            <a href="#" className="text-[#444] text-xs sm:text-[11px] hover:text-[#D4AF37] active:text-[#D4AF37] transition-colors py-1">Terms</a>
+            <a href="/privacy" className="text-[#444] text-xs sm:text-[11px] hover:text-[#D4AF37] active:text-[#D4AF37] transition-colors py-1">Privacy</a>
+            <a href="/terms" className="text-[#444] text-xs sm:text-[11px] hover:text-[#D4AF37] active:text-[#D4AF37] transition-colors py-1">Terms</a>
           </div>
 
           {/* Social */}

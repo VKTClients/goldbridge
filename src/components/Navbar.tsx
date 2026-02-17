@@ -1,9 +1,10 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { Menu, X, Shield, LogOut, LayoutDashboard, ChevronDown } from "lucide-react";
+import { Menu, X, Shield, LogOut, LayoutDashboard, ChevronDown, Sun, Moon } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/context/AuthContext";
+import { useTheme } from "@/context/ThemeContext";
 
 const navLinks = [
   { label: "Home", href: "/" },
@@ -11,6 +12,8 @@ const navLinks = [
   { label: "Why Trust Us", href: "/trust" },
   { label: "Referrals", href: "/referrals" },
   { label: "Packages", href: "/#pricing" },
+  { label: "Privacy", href: "/privacy" },
+  { label: "Terms", href: "/terms" },
 ];
 
 export default function Navbar() {
@@ -19,6 +22,7 @@ export default function Navbar() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { user, setShowAuthModal, logout } = useAuth();
+  const { theme, toggleTheme } = useTheme();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
@@ -53,9 +57,11 @@ export default function Navbar() {
       <div className="max-w-[1400px] mx-auto px-6 md:px-10 h-[72px] flex items-center justify-between">
         {/* Logo */}
         <a href="/" className="flex items-center gap-3 group">
-          <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#D4AF37] via-[#C9A84C] to-[#B8942E] flex items-center justify-center shadow-lg shadow-[#D4AF37]/10 group-hover:shadow-[#D4AF37]/20 transition-shadow duration-500">
-            <span className="text-[#060608] font-bold text-sm">G</span>
-          </div>
+          <img 
+            src="/Image-removebg-preview.png" 
+            alt="Goldbridge Capital" 
+            className="h-8 w-auto object-contain"
+          />
           <div className="hidden sm:flex flex-col">
             <span className="text-white font-semibold text-[13px] tracking-wide leading-tight">
               Goldbridge
@@ -81,7 +87,20 @@ export default function Navbar() {
 
         {/* Right side */}
         <div className="hidden lg:flex items-center gap-3">
-          <div className="flex items-center gap-1.5 text-[11px] text-[#555] px-3 py-1.5 rounded-full border border-white/[0.04] bg-white/[0.02]">
+          {/* Theme Toggle */}
+          <button
+            onClick={toggleTheme}
+            className="w-9 h-9 rounded-full border border-white/[0.06] bg-white/[0.02] flex items-center justify-center hover:bg-white/[0.06] hover:border-[#D4AF37]/20 transition-all duration-300"
+            aria-label="Toggle theme"
+          >
+            {theme === "dark" ? (
+              <Sun size={14} className="text-[#D4AF37]" />
+            ) : (
+              <Moon size={14} className="text-[#555]" />
+            )}
+          </button>
+
+          <div className="flex items-center gap-1.5 text-[11px] text-[#555] dark:text-[#555] px-3 py-1.5 rounded-full border border-white/[0.04] bg-white/[0.02]">
             <Shield size={10} className="text-[#D4AF37]/60" />
             <span>Protected</span>
           </div>
@@ -186,6 +205,24 @@ export default function Navbar() {
                   {link.label}
                 </a>
               ))}
+              {/* Theme Toggle - Mobile */}
+              <button
+                onClick={toggleTheme}
+                className="flex items-center gap-3 text-[#777] py-3.5 text-[15px] font-medium rounded-xl px-2 active:bg-white/[0.03]"
+              >
+                {theme === "dark" ? (
+                  <>
+                    <Sun size={17} className="text-[#D4AF37]" />
+                    Light Mode
+                  </>
+                ) : (
+                  <>
+                    <Moon size={17} />
+                    Dark Mode
+                  </>
+                )}
+              </button>
+
               <div className="divider-gold my-3" />
 
               {user ? (

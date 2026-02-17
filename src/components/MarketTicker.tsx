@@ -70,9 +70,9 @@ export default function MarketTicker() {
 
   return (
     <div className="fixed top-[72px] left-0 right-0 w-full overflow-hidden bg-[#060608]/95 backdrop-blur-sm border-b border-white/[0.03] py-2 z-40">
-      <div className="ticker-track flex gap-8 whitespace-nowrap">
+      <div className="ticker-track flex gap-8 whitespace-nowrap" style={{ minWidth: '200%' }}>
         {items.map((item, i) => (
-          <div key={`${item.symbol}-${i}`} className="flex items-center gap-2 flex-shrink-0">
+          <div key={`${item.symbol}-${i}`} className="flex items-center gap-2 flex-shrink-0 px-4">
             <span className="text-[#555] text-[10px] font-medium">{item.symbol}</span>
             <span className="text-white text-[10px] font-semibold tabular-nums">{item.price}</span>
             <span className={`flex items-center gap-0.5 text-[10px] font-medium tabular-nums ${item.up ? "text-emerald-400" : "text-red-400"}`}>

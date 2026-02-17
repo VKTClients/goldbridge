@@ -19,6 +19,7 @@ import CursorGlow from "@/components/CursorGlow";
 import ScrollProgress from "@/components/ScrollProgress";
 import AuthModal from "@/components/AuthModal";
 import Chatbot from "@/components/Chatbot";
+import Newsletter from "@/components/Newsletter";
 
 export default function Home() {
   return (
@@ -43,6 +44,7 @@ export default function Home() {
         <Plans />
         <WhyTrustUs />
         <Testimonials />
+        <Newsletter />
         <CTA />
         <Footer />
       </main>
