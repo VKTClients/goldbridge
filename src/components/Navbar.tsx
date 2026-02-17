@@ -5,7 +5,6 @@ import { Menu, X, Shield, LogOut, LayoutDashboard, ChevronDown, Sun, Moon } from
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/context/AuthContext";
 import { useTheme } from "@/context/ThemeContext";
-import Image from "next/image";
 
 const navLinks = [
   { label: "Home", href: "/" },
@@ -71,13 +70,10 @@ export default function Navbar() {
       <div className="max-w-[1400px] mx-auto px-6 md:px-10 h-[72px] flex items-center justify-between">
         {/* Logo */}
         <a href="/" className="flex items-center gap-3 group">
-          <Image 
-            src="/logo.png" 
+          <img 
+            src="/logo.svg" 
             alt="Goldbridge Capital" 
-            width={120}
-            height={32}
-            className="h-8 w-auto object-contain"
-            priority
+            className="h-8 w-auto object-contain logo-themed"
           />
           <div className="hidden sm:flex flex-col">
             <span className="text-white font-semibold text-[13px] tracking-wide leading-tight">

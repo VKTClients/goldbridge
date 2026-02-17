@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import Image from "next/image";
 
 export default function PageLoader() {
   const [loading, setLoading] = useState(true);
@@ -29,13 +28,10 @@ export default function PageLoader() {
               animate={{ scale: 1, opacity: 1 }}
               transition={{ duration: 0.5 }}
             >
-              <Image
-                src="/logo.png"
+              <img
+                src="/logo.svg"
                 alt="Goldbridge Capital"
-                width={144}
-                height={48}
-                className="h-12 w-auto object-contain"
-                priority
+                className="h-12 w-auto object-contain logo-themed"
               />
             </motion.div>
 
