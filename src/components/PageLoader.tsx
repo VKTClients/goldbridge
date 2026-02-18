@@ -29,9 +29,9 @@ export default function PageLoader() {
               transition={{ duration: 0.5 }}
             >
               <img
-                src="/logo.svg"
+                src="/logo.png"
                 alt="Goldbridge Capital"
-                className="h-12 w-auto object-contain logo-themed"
+                className="h-32 w-auto object-contain logo-themed"
               />
             </motion.div>
 

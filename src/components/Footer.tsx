@@ -23,9 +23,9 @@ export default function Footer() {
           {/* Logo */}
           <div className="flex items-center gap-3">
             <img 
-              src="/logo.svg" 
+              src="/logo.png" 
               alt="Goldbridge Capital" 
-              className="h-6 w-auto object-contain logo-themed"
+              className="h-16 w-auto object-contain logo-themed"
             />
             <div className="flex flex-col">
               <span className="text-white/60 text-[11px] font-medium tracking-wide">Goldbridge Capital</span>

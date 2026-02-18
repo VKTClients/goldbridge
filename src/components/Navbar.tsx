@@ -71,9 +71,9 @@ export default function Navbar() {
         {/* Logo */}
         <a href="/" className="flex items-center gap-3 group">
           <img 
-            src="/logo.svg" 
+            src="/logo.png" 
             alt="Goldbridge Capital" 
-            className="h-8 w-auto object-contain logo-themed"
+            className="h-20 w-auto object-contain logo-themed"
           />
           <div className="hidden sm:flex flex-col">
             <span className="text-white font-semibold text-[13px] tracking-wide leading-tight">
