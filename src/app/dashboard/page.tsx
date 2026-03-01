@@ -34,7 +34,7 @@ const mockInvestments = [
     date: "2026-01-22", 
     status: "Active",
     currency: "ZAR",
-    paymentMethod: "MoonPay"
+    paymentMethod: "Luno"
   },
   { 
     id: 3, 

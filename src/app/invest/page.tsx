@@ -53,7 +53,7 @@ const currencies = [
 ];
 
 const paymentMethods = [
-  { id: "moonpay", name: "MoonPay", desc: "Crypto, Apple Pay, Bank Transfer", icon: Wallet },
+  { id: "luno", name: "Luno", desc: "Crypto, Bank Transfer", icon: Wallet },
   { id: "card", name: "Card Payment", desc: "Currently Unavailable", icon: CreditCard, disabled: true },
 ];
 
@@ -89,7 +89,7 @@ export default function InvestPage() {
   const { user, isLoading } = useAuth();
   const [amount, setAmount] = useState<string>("");
   const [selectedCurrency, setSelectedCurrency] = useState(0);
-  const [selectedPayment, setSelectedPayment] = useState("moonpay");
+  const [selectedPayment, setSelectedPayment] = useState("luno");
   const [showCurrencyDropdown, setShowCurrencyDropdown] = useState(false);
   const [step, setStep] = useState<"select" | "confirm" | "success">("select");
   const [error, setError] = useState("");

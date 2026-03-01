@@ -5,7 +5,7 @@ import About from "@/components/About";
 import Ecommerce from "@/components/Ecommerce";
 import Services from "@/components/Services";
 import GetStartedSteps from "@/components/GetStartedSteps";
-import WhyMoonPay from "@/components/WhyMoonPay";
+import WhyLuno from "@/components/WhyLuno";
 import Performance from "@/components/Performance";
 import InvestmentCalculator from "@/components/InvestmentCalculator";
 import Plans from "@/components/Plans";
@@ -40,7 +40,7 @@ export default function Home() {
         <Ecommerce />
         <Services />
         <GetStartedSteps />
-        <WhyMoonPay />
+        <WhyLuno />
         <Performance />
         <InvestmentCalculator />
         <Plans />

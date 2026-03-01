@@ -37,7 +37,7 @@ interface KeywordResponse {
 const keywordResponses: KeywordResponse[] = [
   {
     keywords: ["invest", "start", "begin", "deposit", "put money", "get started"],
-    response: "Getting started is easy! 🚀\n\n**3 Simple Steps:**\n1. Sign up or log in to your account\n2. Choose your investment package (Starter, Growth, or Premium)\n3. Fund via Card or MoonPay\n\nYour investment activates immediately and you'll start earning weekly returns!",
+    response: "Getting started is easy! 🚀\n\n**3 Simple Steps:**\n1. Sign up or log in to your account\n2. Choose your investment package (Starter, Growth, or Premium)\n3. Fund via Card or Luno\n\nYour investment activates immediately and you'll start earning weekly returns!",
     followUp: ["What's the minimum?", "Which package is best?"]
   },
   {
@@ -56,9 +56,9 @@ const keywordResponses: KeywordResponse[] = [
     followUp: ["How do I verify?", "Is it mandatory?"]
   },
   {
-    keywords: ["payment", "pay", "card", "moonpay", "crypto", "fund", "method"],
-    response: "We accept multiple payment methods! 💳\n\n• **Credit/Debit Card** — Visa, Mastercard (instant)\n• **MoonPay** — Pay with crypto or bank transfer\n• **EFT** — Direct bank transfer (1-2 days)\n\nAll payments are secured with bank-grade encryption.",
-    followUp: ["Is MoonPay safe?", "Any fees?"]
+    keywords: ["payment", "pay", "card", "luno", "crypto", "fund", "method"],
+    response: "We accept multiple payment methods! 💳\n\n• **Credit/Debit Card** — Visa, Mastercard (instant)\n• **Luno** — Pay with crypto or bank transfer\n• **EFT** — Direct bank transfer (1-2 days)\n\nAll payments are secured with bank-grade encryption.",
+    followUp: ["Is Luno safe?", "Any fees?"]
   },
   {
     keywords: ["safe", "secure", "trust", "legit", "scam", "real", "protection"],
