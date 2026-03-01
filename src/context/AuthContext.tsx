@@ -6,6 +6,7 @@ interface User {
   email: string;
   name: string;
   joined: string;
+  role: "user" | "admin";
   kycStatus: "pending" | "submitted" | "verified";
   kycDocuments?: {
     idDocument?: string;
@@ -14,15 +15,19 @@ interface User {
   };
 }
 
+const ADMIN_EMAILS = ["admin@goldbridge.capital", "admin@goldbridge.com"];
+
 interface AuthContextType {
   user: User | null;
   isLoading: boolean;
+  isAdmin: boolean;
   showAuthModal: boolean;
   setShowAuthModal: (show: boolean) => void;
   login: (email: string, password: string) => Promise<boolean>;
   signup: (name: string, email: string, password: string) => Promise<boolean>;
   logout: () => void;
   updateKycStatus: (status: User["kycStatus"], documents?: User["kycDocuments"]) => void;
+  getAllUsers: () => { email: string; name: string; password: string; joined?: string; role?: string }[];
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -57,10 +62,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const existing = users[email];
     if (existing && existing.password !== password) return false;
 
+    const role = ADMIN_EMAILS.includes(email.toLowerCase()) ? "admin" : "user";
+
     const userData: User = {
       email,
       name: existing?.name || email.split("@")[0],
       joined: new Date().toISOString(),
+      role,
       kycStatus: "pending",
     };
 
@@ -82,10 +90,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     users[email] = { name, password };
     localStorage.setItem("gb_users", JSON.stringify(users));
 
+    const signupRole = ADMIN_EMAILS.includes(email.toLowerCase()) ? "admin" : "user";
+
     const userData: User = {
       email,
       name,
       joined: new Date().toISOString(),
+      role: signupRole,
       kycStatus: "pending",
     };
 
@@ -107,8 +118,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null);
   };
 
+  const isAdmin = user?.role === "admin";
+
+  const getAllUsers = () => {
+    const stored = localStorage.getItem("gb_users");
+    let users: Record<string, { name: string; password: string }> = {};
+    try {
+      users = stored ? JSON.parse(stored) : {};
+    } catch {}
+    return Object.entries(users).map(([email, data]) => ({
+      email,
+      name: data.name,
+      password: data.password,
+      role: ADMIN_EMAILS.includes(email.toLowerCase()) ? "admin" : "user",
+    }));
+  };
+
   return (
-    <AuthContext.Provider value={{ user, isLoading, showAuthModal, setShowAuthModal, login, signup, logout, updateKycStatus }}>
+    <AuthContext.Provider value={{ user, isLoading, isAdmin, showAuthModal, setShowAuthModal, login, signup, logout, updateKycStatus, getAllUsers }}>
       {children}
     </AuthContext.Provider>
   );

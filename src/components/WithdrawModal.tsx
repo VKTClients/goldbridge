@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { X, ArrowRight, Wallet, Building2, AlertCircle, Check, Loader2 } from "lucide-react";
+import { X, ArrowRight, Wallet, AlertCircle, Check, Loader2, Clock } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/context/AuthContext";
 
@@ -11,28 +11,31 @@ interface WithdrawModalProps {
   availableBalance: number;
 }
 
+const walletTypes = [
+  { id: "btc", name: "Bitcoin", symbol: "BTC", color: "text-orange-400", bgColor: "bg-orange-500/10", borderColor: "border-orange-500/20", icon: "₿", placeholder: "bc1q... or 1A1zP1..." },
+  { id: "eth", name: "Ethereum", symbol: "ETH", color: "text-blue-400", bgColor: "bg-blue-500/10", borderColor: "border-blue-500/20", icon: "Ξ", placeholder: "0x742d35Cc..." },
+  { id: "usdt", name: "USDT (TRC20)", symbol: "USDT", color: "text-emerald-400", bgColor: "bg-emerald-500/10", borderColor: "border-emerald-500/20", icon: "₮", placeholder: "TQn9Y2khEs..." },
+];
+
 export default function WithdrawModal({ isOpen, onClose, availableBalance }: WithdrawModalProps) {
   const { user } = useAuth();
-  const [step, setStep] = useState<"amount" | "details" | "confirm" | "success">("amount");
+  const [step, setStep] = useState<"amount" | "wallet" | "confirm" | "success">("amount");
   const [amount, setAmount] = useState("");
-  const [bankName, setBankName] = useState("");
-  const [accountNumber, setAccountNumber] = useState("");
-  const [accountHolder, setAccountHolder] = useState("");
-  const [branchCode, setBranchCode] = useState("");
+  const [selectedWalletType, setSelectedWalletType] = useState(0);
+  const [walletAddress, setWalletAddress] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
 
   const amountNum = parseFloat(amount) || 0;
   const minWithdraw = 500;
   const maxWithdraw = user?.kycStatus === "verified" ? availableBalance : Math.min(availableBalance, 10000);
+  const wallet = walletTypes[selectedWalletType];
 
   const reset = () => {
     setStep("amount");
     setAmount("");
-    setBankName("");
-    setAccountNumber("");
-    setAccountHolder("");
-    setBranchCode("");
+    setSelectedWalletType(0);
+    setWalletAddress("");
     setError("");
   };
 
@@ -56,20 +59,33 @@ export default function WithdrawModal({ isOpen, onClose, availableBalance }: Wit
 
   const handleContinue = () => {
     if (validateAmount()) {
-      setStep("details");
+      setStep("wallet");
     }
   };
 
   const handleSubmit = async () => {
-    if (!bankName || !accountNumber || !accountHolder) {
-      setError("Please fill in all required fields");
+    if (!walletAddress || walletAddress.length < 10) {
+      setError("Please enter a valid wallet address");
       return;
     }
     
     setIsSubmitting(true);
     setError("");
+
+    // Store withdrawal record in localStorage
+    const existingWithdrawals = JSON.parse(localStorage.getItem("gb_withdrawals") || "[]");
+    const newWithdrawal = {
+      id: `wd-${Date.now()}`,
+      amount: amountNum,
+      walletAddress,
+      walletType: wallet.symbol,
+      date: new Date().toISOString().split("T")[0],
+      status: "pending",
+      userEmail: user?.email || "",
+    };
+    existingWithdrawals.push(newWithdrawal);
+    localStorage.setItem("gb_withdrawals", JSON.stringify(existingWithdrawals));
     
-    // Simulate processing
     await new Promise(resolve => setTimeout(resolve, 2000));
     
     setStep("success");
@@ -184,80 +200,57 @@ export default function WithdrawModal({ isOpen, onClose, availableBalance }: Wit
                 </motion.div>
               )}
 
-              {/* Bank Details Step */}
-              {step === "details" && (
+              {/* Crypto Wallet Step */}
+              {step === "wallet" && (
                 <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
                   <div className="flex items-center gap-3 mb-5">
-                    <div className="w-10 h-10 rounded-full bg-blue-500/10 border border-blue-500/20 flex items-center justify-center">
-                      <Building2 size={18} className="text-blue-400" />
+                    <div className="w-10 h-10 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
+                      <Wallet size={18} className="text-emerald-400" />
                     </div>
                     <div>
-                      <h2 className="text-white text-lg font-display font-semibold">Bank Details</h2>
-                      <p className="text-[#555] text-xs">Enter your bank account information</p>
+                      <h2 className="text-white text-lg font-display font-semibold">Your Crypto Wallet</h2>
+                      <p className="text-[#555] text-xs">Enter the wallet address to receive funds</p>
                     </div>
                   </div>
 
-                  <div className="space-y-3 mb-5">
-                    <div>
-                      <label className="text-[#555] text-[10px] uppercase tracking-[0.15em] mb-1.5 block">
-                        Bank Name *
-                      </label>
-                      <select
-                        value={bankName}
-                        onChange={(e) => setBankName(e.target.value)}
-                        className="w-full bg-white/[0.03] border border-white/[0.06] rounded-xl px-4 py-3 text-white text-sm outline-none focus:border-[#D4AF37]/30 transition-colors appearance-none cursor-pointer"
-                      >
-                        <option value="" className="bg-[#0a0a0e]">Select bank</option>
-                        <option value="fnb" className="bg-[#0a0a0e]">FNB (First National Bank)</option>
-                        <option value="standard" className="bg-[#0a0a0e]">Standard Bank</option>
-                        <option value="absa" className="bg-[#0a0a0e]">ABSA</option>
-                        <option value="nedbank" className="bg-[#0a0a0e]">Nedbank</option>
-                        <option value="capitec" className="bg-[#0a0a0e]">Capitec</option>
-                        <option value="investec" className="bg-[#0a0a0e]">Investec</option>
-                        <option value="african" className="bg-[#0a0a0e]">African Bank</option>
-                        <option value="tymebank" className="bg-[#0a0a0e]">TymeBank</option>
-                        <option value="discovery" className="bg-[#0a0a0e]">Discovery Bank</option>
-                      </select>
+                  {/* Wallet Type Selection */}
+                  <div className="mb-4">
+                    <label className="text-[#555] text-[10px] uppercase tracking-[0.2em] mb-2 block">
+                      Select Cryptocurrency
+                    </label>
+                    <div className="grid grid-cols-3 gap-2">
+                      {walletTypes.map((w, i) => (
+                        <button
+                          key={w.id}
+                          onClick={() => setSelectedWalletType(i)}
+                          className={`flex flex-col items-center gap-1.5 p-3 rounded-xl border transition-all ${
+                            selectedWalletType === i
+                              ? `${w.bgColor} ${w.borderColor} ${w.color}`
+                              : "bg-white/[0.02] border-white/[0.06] text-[#666] hover:border-white/[0.1]"
+                          }`}
+                        >
+                          <span className="text-lg font-bold">{w.icon}</span>
+                          <span className="text-[10px] font-semibold">{w.symbol}</span>
+                        </button>
+                      ))}
                     </div>
+                  </div>
 
-                    <div>
-                      <label className="text-[#555] text-[10px] uppercase tracking-[0.15em] mb-1.5 block">
-                        Account Holder Name *
-                      </label>
-                      <input
-                        type="text"
-                        value={accountHolder}
-                        onChange={(e) => setAccountHolder(e.target.value)}
-                        placeholder="John Doe"
-                        className="w-full bg-white/[0.03] border border-white/[0.06] rounded-xl px-4 py-3 text-white text-sm outline-none focus:border-[#D4AF37]/30 transition-colors"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="text-[#555] text-[10px] uppercase tracking-[0.15em] mb-1.5 block">
-                        Account Number *
-                      </label>
-                      <input
-                        type="text"
-                        value={accountNumber}
-                        onChange={(e) => setAccountNumber(e.target.value)}
-                        placeholder="1234567890"
-                        className="w-full bg-white/[0.03] border border-white/[0.06] rounded-xl px-4 py-3 text-white text-sm outline-none focus:border-[#D4AF37]/30 transition-colors"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="text-[#555] text-[10px] uppercase tracking-[0.15em] mb-1.5 block">
-                        Branch Code (Optional)
-                      </label>
-                      <input
-                        type="text"
-                        value={branchCode}
-                        onChange={(e) => setBranchCode(e.target.value)}
-                        placeholder="250655"
-                        className="w-full bg-white/[0.03] border border-white/[0.06] rounded-xl px-4 py-3 text-white text-sm outline-none focus:border-[#D4AF37]/30 transition-colors"
-                      />
-                    </div>
+                  {/* Wallet Address Input */}
+                  <div className="mb-5">
+                    <label className="text-[#555] text-[10px] uppercase tracking-[0.15em] mb-1.5 block">
+                      {wallet.name} Wallet Address *
+                    </label>
+                    <input
+                      type="text"
+                      value={walletAddress}
+                      onChange={(e) => { setWalletAddress(e.target.value); setError(""); }}
+                      placeholder={wallet.placeholder}
+                      className="w-full bg-white/[0.03] border border-white/[0.06] rounded-xl px-4 py-3 text-white text-sm font-mono outline-none focus:border-emerald-500/30 transition-colors"
+                    />
+                    <p className="text-[#444] text-[9px] mt-1.5">
+                      Make sure this is a valid <span className={wallet.color}>{wallet.symbol}</span> address. Sending to the wrong address may result in permanent loss.
+                    </p>
                   </div>
 
                   {error && (
@@ -272,8 +265,15 @@ export default function WithdrawModal({ isOpen, onClose, availableBalance }: Wit
                       Back
                     </button>
                     <button
-                      onClick={() => setStep("confirm")}
-                      disabled={!bankName || !accountNumber || !accountHolder}
+                      onClick={() => {
+                        if (!walletAddress || walletAddress.length < 10) {
+                          setError("Please enter a valid wallet address");
+                          return;
+                        }
+                        setError("");
+                        setStep("confirm");
+                      }}
+                      disabled={!walletAddress}
                       className="flex-1 btn-gold py-2.5 text-sm disabled:opacity-30"
                     >
                       Review
@@ -296,27 +296,26 @@ export default function WithdrawModal({ isOpen, onClose, availableBalance }: Wit
 
                     <div className="space-y-2.5 text-xs">
                       <div className="flex justify-between">
-                        <span className="text-[#555]">Bank</span>
-                        <span className="text-white capitalize">{bankName}</span>
+                        <span className="text-[#555]">Cryptocurrency</span>
+                        <span className={`font-semibold ${wallet.color}`}>{wallet.name} ({wallet.symbol})</span>
                       </div>
-                      <div className="flex justify-between">
-                        <span className="text-[#555]">Account Holder</span>
-                        <span className="text-white">{accountHolder}</span>
+                      <div className="flex justify-between items-start gap-3">
+                        <span className="text-[#555] flex-shrink-0">Wallet Address</span>
+                        <span className="text-white font-mono text-[11px] text-right break-all">{walletAddress}</span>
                       </div>
-                      <div className="flex justify-between">
-                        <span className="text-[#555]">Account Number</span>
-                        <span className="text-white">****{accountNumber.slice(-4)}</span>
-                      </div>
-                      {branchCode && (
-                        <div className="flex justify-between">
-                          <span className="text-[#555]">Branch Code</span>
-                          <span className="text-white">{branchCode}</span>
-                        </div>
-                      )}
                       <div className="flex justify-between pt-2 border-t border-white/[0.06]">
                         <span className="text-[#555]">Processing Time</span>
-                        <span className="text-[#D4AF37]">1-2 Business Days</span>
+                        <span className="text-[#D4AF37]">1-24 Hours</span>
                       </div>
+                    </div>
+                  </div>
+
+                  <div className="p-3 bg-amber-500/[0.04] border border-amber-500/[0.12] rounded-xl mb-5">
+                    <div className="flex items-start gap-2">
+                      <AlertCircle size={13} className="text-amber-400 mt-0.5 flex-shrink-0" />
+                      <p className="text-[#777] text-[10px] leading-relaxed">
+                        Please double-check the wallet address. Crypto transactions are irreversible.
+                      </p>
                     </div>
                   </div>
 
@@ -326,7 +325,7 @@ export default function WithdrawModal({ isOpen, onClose, availableBalance }: Wit
 
                   <div className="flex gap-3">
                     <button
-                      onClick={() => setStep("details")}
+                      onClick={() => setStep("wallet")}
                       className="flex-1 py-2.5 text-sm text-[#666] border border-white/[0.06] rounded-xl hover:bg-white/[0.02]"
                     >
                       Back
@@ -365,17 +364,29 @@ export default function WithdrawModal({ isOpen, onClose, availableBalance }: Wit
                   <h2 className="text-white text-xl font-display font-semibold mb-2">
                     Withdrawal Requested!
                   </h2>
-                  <p className="text-[#555] text-sm mb-6 leading-relaxed">
-                    Your withdrawal of <span className="text-emerald-400 font-semibold">R{amountNum.toLocaleString()}</span> has been submitted. 
-                    Funds will arrive in 1-2 business days.
+                  <p className="text-[#555] text-sm mb-4 leading-relaxed">
+                    Your withdrawal of <span className="text-emerald-400 font-semibold">R{amountNum.toLocaleString()}</span> to your {wallet.symbol} wallet has been submitted.
                   </p>
+
+                  <div className="p-3 bg-amber-500/[0.05] border border-amber-500/[0.15] rounded-xl mb-5">
+                    <div className="flex items-start gap-2">
+                      <Clock size={14} className="text-amber-400 mt-0.5 flex-shrink-0" />
+                      <p className="text-[#888] text-[11px] leading-relaxed">
+                        Withdrawals are processed within 1-24 hours. You&apos;ll receive your {wallet.symbol} once confirmed by our admin team.
+                      </p>
+                    </div>
+                  </div>
 
                   <div className="p-4 bg-white/[0.02] rounded-xl border border-white/[0.04] mb-6 text-left">
                     <p className="text-[#888] text-xs mb-2">
                       <span className="text-[#D4AF37]">Reference:</span> WD-{Date.now().toString(36).toUpperCase()}
                     </p>
+                    <p className="text-[#888] text-xs mb-2">
+                      <span className="text-[#D4AF37]">Wallet:</span>{" "}
+                      <span className="font-mono text-[11px]">{walletAddress.slice(0, 12)}...{walletAddress.slice(-6)}</span>
+                    </p>
                     <p className="text-[#888] text-xs">
-                      <span className="text-[#D4AF37]">Status:</span> Processing
+                      <span className="text-[#D4AF37]">Status:</span> Pending Admin Approval
                     </p>
                   </div>
 

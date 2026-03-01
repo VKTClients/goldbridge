@@ -21,7 +21,7 @@ export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const { user, setShowAuthModal, logout } = useAuth();
+  const { user, setShowAuthModal, logout, isAdmin } = useAuth();
   const { theme, toggleTheme } = useTheme();
 
   useEffect(() => {
@@ -158,6 +158,16 @@ export default function Navbar() {
                         <LayoutDashboard size={13} />
                         Dashboard
                       </a>
+                      {isAdmin && (
+                        <a
+                          href="/admin"
+                          className="flex items-center gap-2.5 px-3 py-2 text-[#D4AF37]/80 hover:text-[#D4AF37] hover:bg-[#D4AF37]/[0.04] rounded-lg transition-all text-xs"
+                          onClick={() => setDropdownOpen(false)}
+                        >
+                          <Shield size={13} />
+                          Admin Panel
+                        </a>
+                      )}
                       <button
                         onClick={handleLogout}
                         className="flex items-center gap-2.5 px-3 py-2 text-[#888] hover:text-red-400 hover:bg-red-500/[0.04] rounded-lg transition-all text-xs w-full text-left"
@@ -249,6 +259,16 @@ export default function Navbar() {
                     <LayoutDashboard size={17} />
                     Dashboard
                   </a>
+                  {isAdmin && (
+                    <a
+                      href="/admin"
+                      className="flex items-center gap-3 text-[#D4AF37]/80 py-3.5 text-[15px] font-medium rounded-xl px-2 active:bg-[#D4AF37]/[0.06]"
+                      onClick={() => setMobileOpen(false)}
+                    >
+                      <Shield size={17} />
+                      Admin Panel
+                    </a>
+                  )}
                   <button
                     onClick={() => { handleLogout(); setMobileOpen(false); }}
                     className="flex items-center gap-3 text-[#555] hover:text-red-400 active:text-red-400 py-3.5 text-[15px] font-medium transition-colors text-left rounded-xl px-2 active:bg-red-500/[0.04]"

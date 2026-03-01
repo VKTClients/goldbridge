@@ -13,6 +13,7 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import KYCModal from "@/components/KYCModal";
 import WithdrawModal from "@/components/WithdrawModal";
+import DepositModal from "@/components/DepositModal";
 
 // Realistic mock investments
 const mockInvestments = [
@@ -176,6 +177,7 @@ export default function DashboardPage() {
   const [txFilter, setTxFilter] = useState<"all" | "deposit" | "return" | "withdrawal">("all");
   const [showKYCModal, setShowKYCModal] = useState(false);
   const [showWithdrawModal, setShowWithdrawModal] = useState(false);
+  const [showDepositModal, setShowDepositModal] = useState(false);
   const investments = mockInvestments;
 
   const referralCode = user ? `GB-${user.name.replace(/\s/g, "").toUpperCase().slice(0, 4)}-${Math.random().toString(36).slice(2, 6).toUpperCase()}` : "";
@@ -224,6 +226,10 @@ export default function DashboardPage() {
         isOpen={showWithdrawModal} 
         onClose={() => setShowWithdrawModal(false)} 
         availableBalance={availableBalance}
+      />
+      <DepositModal
+        isOpen={showDepositModal}
+        onClose={() => setShowDepositModal(false)}
       />
     <div className="min-h-screen bg-[#060608] flex">
       {/* Sidebar — Desktop */}
@@ -518,10 +524,13 @@ export default function DashboardPage() {
             >
               {/* Quick Actions */}
               <div className="grid grid-cols-3 gap-2 md:gap-3 mb-4">
-                <a href="/invest" className="flex items-center justify-center gap-2 bg-[#0a0a0e] border border-white/[0.04] rounded-xl p-3 hover:bg-white/[0.02] hover:border-[#D4AF37]/10 transition-all group">
+                <button 
+                  onClick={() => setShowDepositModal(true)}
+                  className="flex items-center justify-center gap-2 bg-[#0a0a0e] border border-white/[0.04] rounded-xl p-3 hover:bg-white/[0.02] hover:border-[#D4AF37]/10 transition-all group"
+                >
                   <Wallet size={14} className="text-[#D4AF37] group-hover:scale-110 transition-transform" />
                   <span className="text-white text-[11px] font-medium">Deposit</span>
-                </a>
+                </button>
                 <button 
                   onClick={() => setShowWithdrawModal(true)}
                   className="flex items-center justify-center gap-2 bg-[#0a0a0e] border border-white/[0.04] rounded-xl p-3 hover:bg-white/[0.02] hover:border-emerald-500/10 transition-all group"

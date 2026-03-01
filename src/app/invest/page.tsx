@@ -3,7 +3,7 @@
 import { useEffect, useState, useMemo } from "react";
 import { useAuth } from "@/context/AuthContext";
 import {
-  ArrowLeft, Check, ArrowUpRight, CreditCard, Wallet,
+  ArrowLeft, Check, ArrowUpRight, Copy, Wallet,
   TrendingUp, Shield, AlertTriangle, ChevronDown, Info
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -52,9 +52,10 @@ const currencies = [
   { code: "BTC", symbol: "₿", name: "Bitcoin", flag: "₿", rate: 0.0000005 },
 ];
 
-const paymentMethods = [
-  { id: "luno", name: "Luno", desc: "Crypto, Bank Transfer", icon: Wallet },
-  { id: "card", name: "Card Payment", desc: "Currently Unavailable", icon: CreditCard, disabled: true },
+const cryptoWallets = [
+  { id: "btc", name: "Bitcoin", symbol: "BTC", address: "bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh", network: "Bitcoin Network", icon: "₿", color: "text-orange-400", bgColor: "bg-orange-500/10", borderColor: "border-orange-500/20" },
+  { id: "eth", name: "Ethereum", symbol: "ETH", address: "0x742d35Cc6634C0532925a3b844Bc9e7595f2bD18", network: "ERC-20 Network", icon: "Ξ", color: "text-blue-400", bgColor: "bg-blue-500/10", borderColor: "border-blue-500/20" },
+  { id: "usdt", name: "USDT", symbol: "USDT", address: "TQn9Y2khEsLJW1ChNWShFYKwxhA5sR7CiB", network: "TRC-20 Network", icon: "₮", color: "text-emerald-400", bgColor: "bg-emerald-500/10", borderColor: "border-emerald-500/20" },
 ];
 
 interface StoredInvestment {
@@ -89,7 +90,8 @@ export default function InvestPage() {
   const { user, isLoading } = useAuth();
   const [amount, setAmount] = useState<string>("");
   const [selectedCurrency, setSelectedCurrency] = useState(0);
-  const [selectedPayment, setSelectedPayment] = useState("luno");
+  const [selectedWallet, setSelectedWallet] = useState(0);
+  const [copiedAddress, setCopiedAddress] = useState(false);
   const [showCurrencyDropdown, setShowCurrencyDropdown] = useState(false);
   const [step, setStep] = useState<"select" | "confirm" | "success">("select");
   const [error, setError] = useState("");
@@ -171,7 +173,7 @@ export default function InvestPage() {
       amount: amountNum,
       currency: currency.code,
       amountZAR: Math.round(amountZAR),
-      paymentMethod: selectedPayment,
+      paymentMethod: cryptoWallets[selectedWallet].symbol,
       date: new Date().toISOString().split("T")[0],
       status: "Active",
     };
@@ -382,29 +384,52 @@ export default function InvestPage() {
                     })}
                   </div>
 
-                  {/* Payment Method */}
-                  <h4 className="text-[#555] text-[10px] uppercase tracking-[0.2em] mb-3">Payment Method</h4>
-                  <div className="grid grid-cols-2 gap-2 mb-5">
-                    {paymentMethods.map((pm) => (
+                  {/* Crypto Wallet Selection */}
+                  <h4 className="text-[#555] text-[10px] uppercase tracking-[0.2em] mb-3">Send Payment Via Crypto</h4>
+                  <div className="grid grid-cols-3 gap-2 mb-4">
+                    {cryptoWallets.map((w, i) => (
                       <button
-                        key={pm.id}
-                        onClick={() => !pm.disabled && setSelectedPayment(pm.id)}
-                        disabled={pm.disabled}
-                        className={`flex items-center gap-3 p-3.5 rounded-xl border transition-all ${
-                          pm.disabled
-                            ? "bg-white/[0.01] border-white/[0.02] text-[#333] cursor-not-allowed opacity-50"
-                            : selectedPayment === pm.id
-                            ? "bg-[#D4AF37]/[0.06] border-[#D4AF37]/20 text-[#D4AF37]"
+                        key={w.id}
+                        onClick={() => { setSelectedWallet(i); setCopiedAddress(false); }}
+                        className={`flex flex-col items-center gap-1.5 p-3 rounded-xl border transition-all ${
+                          selectedWallet === i
+                            ? `${w.bgColor} ${w.borderColor} ${w.color}`
                             : "bg-white/[0.02] border-white/[0.06] text-[#666] hover:border-white/[0.1]"
                         }`}
                       >
-                        <pm.icon size={18} />
-                        <div className="text-left">
-                          <p className="text-xs font-semibold">{pm.name}</p>
-                          <p className="text-[9px] opacity-60">{pm.desc}</p>
-                        </div>
+                        <span className="text-lg font-bold">{w.icon}</span>
+                        <span className="text-[10px] font-semibold">{w.symbol}</span>
                       </button>
                     ))}
+                  </div>
+
+                  {/* Wallet Address */}
+                  <div className="mb-5">
+                    <div className="relative">
+                      <div className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-3 pr-11">
+                        <p className="text-[#888] text-[9px] mb-1">{cryptoWallets[selectedWallet].name} — {cryptoWallets[selectedWallet].network}</p>
+                        <p className="text-white text-[10px] font-mono break-all leading-relaxed">
+                          {cryptoWallets[selectedWallet].address}
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => {
+                          navigator.clipboard.writeText(cryptoWallets[selectedWallet].address);
+                          setCopiedAddress(true);
+                          setTimeout(() => setCopiedAddress(false), 2000);
+                        }}
+                        className={`absolute right-2.5 top-1/2 -translate-y-1/2 w-7 h-7 rounded-lg flex items-center justify-center transition-colors ${
+                          copiedAddress
+                            ? "bg-emerald-500/20 text-emerald-400"
+                            : "bg-white/[0.05] text-[#555] hover:text-white hover:bg-white/[0.1]"
+                        }`}
+                      >
+                        {copiedAddress ? <Check size={12} /> : <Copy size={12} />}
+                      </button>
+                    </div>
+                    <p className="text-[#444] text-[8px] mt-1.5">
+                      Send your crypto to this address, then confirm your investment. Our admin team will verify the payment.
+                    </p>
                   </div>
 
                   {/* Error */}
@@ -526,7 +551,7 @@ export default function InvestPage() {
                   </div>
                   <div className="flex items-center justify-between py-3 border-b border-white/[0.04]">
                     <span className="text-[#555] text-xs">Payment Method</span>
-                    <span className="text-white text-sm">{paymentMethods.find((p) => p.id === selectedPayment)?.name}</span>
+                    <span className={`text-sm font-semibold ${cryptoWallets[selectedWallet].color}`}>{cryptoWallets[selectedWallet].name} ({cryptoWallets[selectedWallet].symbol})</span>
                   </div>
                   <div className="flex items-center justify-between py-3 border-b border-white/[0.04]">
                     <span className="text-[#555] text-xs">Weekly Return (est.)</span>
