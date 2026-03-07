@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { MessageCircle, X, Send, Bot, User, Sparkles } from "lucide-react";
 
@@ -9,135 +9,211 @@ interface Message {
   role: "user" | "bot";
   content: string;
   time: string;
-}
-
-const quickReplies = [
-  "💰 How do I start investing?",
-  "📈 What returns can I expect?",
-  "🏦 How do withdrawals work?",
-  "🔐 What is KYC verification?",
-  "💳 Payment methods accepted?",
-  "📞 Contact support",
-];
-
-const suggestedQuestions = [
-  "What's the minimum investment?",
-  "How often are payouts?",
-  "Is my money safe?",
-  "How long until I see returns?",
-];
-
-// Keyword-based response system
-interface KeywordResponse {
-  keywords: string[];
-  response: string;
   followUp?: string[];
 }
 
-const keywordResponses: KeywordResponse[] = [
+interface BotReply {
+  content: string;
+  followUp?: string[];
+}
+
+interface KnowledgeItem {
+  keywords: string[];
+  reply: BotReply;
+}
+
+const quickReplies = [
+  "How do I get started?",
+  "What is the minimum investment?",
+  "How do deposits work?",
+  "How do withdrawals work?",
+  "What is KYC verification?",
+  "What risks are involved?",
+];
+
+const fallbackPrompts = [
+  "What markets do you invest in?",
+  "Are returns guaranteed?",
+  "What fees may apply?",
+];
+
+const knowledgeBase: KnowledgeItem[] = [
   {
-    keywords: ["invest", "start", "begin", "deposit", "put money", "get started"],
-    response: "Getting started is easy! 🚀\n\n**3 Simple Steps:**\n1. Sign up or log in to your account\n2. Choose your investment package (Starter, Growth, or Premium)\n3. Fund via Card or Luno\n\nYour investment activates immediately and you'll start earning weekly returns!",
-    followUp: ["What's the minimum?", "Which package is best?"]
+    keywords: ["start", "begin", "onboarding", "join", "signup", "sign up", "register"],
+    reply: {
+      content:
+        "To get started, complete the onboarding process and then follow the deposit instructions provided on the platform.\n\nA typical flow is:\n1. Create or access your account\n2. Review the available investment tier\n3. Complete KYC if required\n4. Send your deposit to the official wallet provided during onboarding",
+      followUp: ["How do deposits work?", "What is the minimum investment?"],
+    },
   },
   {
-    keywords: ["return", "profit", "earn", "make money", "roi", "percentage", "weekly"],
-    response: "Our weekly returns vary by tier:\n\n💎 **Starter** (R1,000–R4,999): 15–20% weekly\n🥇 **Growth** (R5,000–R9,999): 25–35% weekly\n👑 **Premium** (R10,000+): 40–50% weekly\n\nReturns are paid every Monday directly to your account balance.",
-    followUp: ["How do I upgrade?", "When are payouts?"]
+    keywords: ["deposit", "fund", "send", "wallet", "usdt", "erc20", "erc-20"],
+    reply: {
+      content:
+        "Deposits are made by transferring Tether (USDT) on the Ethereum ERC-20 network to the official Gold Bridge Capital wallet address provided during onboarding.\n\nDeposits are typically confirmed once the blockchain transaction is verified, which usually takes a few minutes depending on Ethereum network activity.",
+      followUp: ["How long do deposits take?", "What fees may apply?"],
+    },
   },
   {
-    keywords: ["withdraw", "cash out", "take out", "get my money", "payout", "bank"],
-    response: "Withdrawals are quick and easy! 💸\n\n• **Processing time:** 1-2 business days\n• **No lock-up periods** — withdraw anytime\n• **No hidden fees** on withdrawals\n\nGo to Dashboard → Click 'Withdraw' → Enter amount and bank details. That's it!",
-    followUp: ["What's the minimum withdrawal?", "Which banks supported?"]
+    keywords: ["confirm", "confirmation", "how long", "minutes", "deposit take"],
+    reply: {
+      content:
+        "Deposit timing depends on blockchain confirmation. In most cases it takes a few minutes, but it can vary based on Ethereum network activity.",
+      followUp: ["How do deposits work?", "What cryptocurrency is accepted?"],
+    },
+  },
+  {
+    keywords: ["withdraw", "withdrawal", "cash out", "take out", "payout"],
+    reply: {
+      content:
+        "Withdrawal requests can be submitted through the platform. Once approved, funds are processed and transferred back according to the applicable withdrawal procedure.\n\nWithdrawal availability may depend on the investment structure or cycle tied to your selected tier.",
+      followUp: ["Can I withdraw anytime?", "What is KYC verification?"],
+    },
+  },
+  {
+    keywords: ["minimum", "smallest", "least", "entry", "start amount"],
+    reply: {
+      content:
+        "The minimum investment amount may vary depending on the selected investment tier. Each tier represents a different level of capital allocation and strategic exposure.",
+      followUp: ["What are investment tiers?", "How do I get started?"],
+    },
+  },
+  {
+    keywords: ["tier", "tiers", "plan", "package", "level"],
+    reply: {
+      content:
+        "Investment tiers represent different levels of capital participation. Each tier may provide different strategic exposure depending on the amount of capital allocated.",
+      followUp: ["What is the minimum investment?", "Can I withdraw anytime?"],
+    },
+  },
+  {
+    keywords: ["return", "returns", "profit", "guarantee", "guaranteed", "roi"],
+    reply: {
+      content:
+        "Returns are not guaranteed. All investments carry risk, and outcomes depend on market conditions, strategy performance, and capital allocation.",
+      followUp: ["What risks are involved?", "What markets do you invest in?"],
+    },
+  },
+  {
+    keywords: ["risk", "safe", "security", "secure", "volatility", "loss"],
+    reply: {
+      content:
+        "As with any investment, there are risks associated with market volatility, economic conditions, and digital asset fluctuations.\n\nCryptocurrency transactions are secured through blockchain technology, and clients should also follow wallet-security best practices when sending funds.",
+      followUp: ["Are returns guaranteed?", "How do withdrawals work?"],
+    },
   },
   {
     keywords: ["kyc", "verify", "verification", "identity", "document", "id"],
-    response: "KYC (Know Your Customer) verification unlocks full features! 🔐\n\n**What you need:**\n• Valid ID (passport, national ID, or driver's license)\n• Proof of address (utility bill or bank statement)\n• A selfie photo\n\n**Benefits:** Higher withdrawal limits, faster processing, full account access.\n\nVerification takes 1-2 business days.",
-    followUp: ["How do I verify?", "Is it mandatory?"]
+    reply: {
+      content:
+        "KYC verification is used to confirm identity and support compliance procedures. It is typically part of the onboarding flow and may be required for access to full account functionality or withdrawal processing.",
+      followUp: ["How do I get started?", "How do withdrawals work?"],
+    },
   },
   {
-    keywords: ["payment", "pay", "card", "luno", "crypto", "fund", "method"],
-    response: "We accept multiple payment methods! 💳\n\n• **Credit/Debit Card** — Visa, Mastercard (instant)\n• **Luno** — Pay with crypto or bank transfer\n• **EFT** — Direct bank transfer (1-2 days)\n\nAll payments are secured with bank-grade encryption.",
-    followUp: ["Is Luno safe?", "Any fees?"]
+    keywords: ["market", "markets", "sector", "ecommerce", "e-commerce", "digital asset", "financial instruments"],
+    reply: {
+      content:
+        "Gold Bridge Capital participates across three primary sectors:\n- E-commerce investments\n- Digital assets\n- Global financial markets",
+      followUp: ["How does Gold Bridge Capital generate returns?", "What risks are involved?"],
+    },
   },
   {
-    keywords: ["safe", "secure", "trust", "legit", "scam", "real", "protection"],
-    response: "Your security is our top priority! 🛡️\n\n✅ **Bank-grade encryption** (256-bit SSL)\n✅ **Regulated & compliant** (KYC/AML)\n✅ **Cold storage** for digital assets\n✅ **24/7 monitoring** & fraud detection\n✅ **25+ years** in business since 2000\n\nOver 12,000 investors trust us with $1.8B+ in assets.",
-    followUp: ["How long in business?", "Where are you based?"]
+    keywords: ["generate", "strategy", "strategies", "allocation", "managed", "actively managed"],
+    reply: {
+      content:
+        "Capital is deployed through structured strategies involving market research, allocation planning, execution, and ongoing monitoring. The focus is on disciplined participation rather than short-term speculation.",
+      followUp: ["What markets do you invest in?", "Are returns guaranteed?"],
+    },
   },
   {
-    keywords: ["minimum", "min", "least", "smallest", "start with"],
-    response: "You can start investing with as little as **R1,000** (about $54 USD)! 💰\n\n**Minimum by tier:**\n• Starter: R1,000\n• Growth: R5,000\n• Premium: R10,000\n\nNo maximum limit — invest as much as you're comfortable with.",
-    followUp: ["What tier is best?", "Can I upgrade later?"]
+    keywords: ["fee", "fees", "charge", "cost", "gas", "transaction cost"],
+    reply: {
+      content:
+        "Certain operational or transaction fees may apply depending on the investment structure or blockchain transaction costs. The exact impact can vary by tier and by network conditions.",
+      followUp: ["How do deposits work?", "How do withdrawals work?"],
+    },
   },
   {
-    keywords: ["fee", "charge", "cost", "commission", "hidden"],
-    response: "We believe in transparency! 📋\n\n• **No deposit fees**\n• **No withdrawal fees**\n• **No hidden charges**\n• **No management fees**\n\nWhat you invest is what works for you. Returns are calculated on your full investment amount.",
-    followUp: ["How do you make money?", "Any catches?"]
+    keywords: ["track", "dashboard", "report", "performance", "updates"],
+    reply: {
+      content:
+        "Clients are typically able to track investment activity and performance through platform updates and reporting cycles provided by Gold Bridge Capital.",
+      followUp: ["How do I get started?", "What are investment tiers?"],
+    },
   },
   {
-    keywords: ["support", "help", "contact", "email", "phone", "whatsapp", "chat"],
-    response: "We're here to help! 📞\n\n• **Email:** support@goldbridge.capital\n• **WhatsApp:** +27 12 345 6789\n• **Live Chat:** Available 24/7 (that's me! 🤖)\n\nPremium clients get a dedicated account manager for personalized support.",
-    followUp: ["Response time?", "Premium benefits?"]
+    keywords: ["support", "contact", "help", "email", "phone", "whatsapp"],
+    reply: {
+      content:
+        "For support, use the official communication channels provided on the website or in your onboarding materials. If you are already registered, the fastest route is usually through your platform support path or account contact details.",
+      followUp: ["How do I get started?", "How do withdrawals work?"],
+    },
   },
   {
-    keywords: ["referral", "refer", "invite", "friend", "bonus", "affiliate"],
-    response: "Earn by sharing! 🎁\n\n**Referral Program:**\n• Get a unique referral link from your dashboard\n• Earn **5% bonus** on every friend's first investment\n• No limit on referrals!\n\nYour friends also get a welcome bonus when they sign up.",
-    followUp: ["How do I get my link?", "When do I get paid?"]
-  },
-  {
-    keywords: ["package", "plan", "tier", "level", "upgrade", "difference"],
-    response: "We offer 3 investment tiers:\n\n💎 **Starter** (R1K–R5K)\n→ 15-20% weekly returns\n→ Perfect for beginners\n\n🥇 **Growth** (R5K–R10K)\n→ 25-35% weekly returns\n→ Best value tier\n\n👑 **Premium** (R10K+)\n→ 40-50% weekly returns\n→ Priority support & features\n\nYou can upgrade anytime by adding more funds!",
-    followUp: ["Which is most popular?", "Can I have multiple?"]
-  },
-  {
-    keywords: ["when", "payout", "monday", "paid", "receive", "schedule"],
-    response: "Payouts are processed every **Monday**! 📅\n\n• Returns calculated on Sunday night\n• Credited to your account Monday morning\n• Withdraw anytime or reinvest\n\nYou'll receive a notification when your payout is ready.",
-    followUp: ["Can I auto-reinvest?", "What time Monday?"]
-  },
-  {
-    keywords: ["account", "login", "password", "sign", "register", "forgot"],
-    response: "Account help:\n\n🔑 **Forgot password?** Click 'Forgot Password' on login page\n📧 **Can't login?** Check your email for verification\n🆕 **New user?** Click 'Sign Up' to create account\n\nNeed more help? Contact support@goldbridge.capital",
-    followUp: ["Reset my password", "Delete my account"]
+    keywords: ["hello", "hi", "hey", "good morning", "good afternoon", "good evening"],
+    reply: {
+      content:
+        "Welcome to Gold Bridge Capital. I can help with onboarding, deposits, withdrawals, tiers, KYC, and general investment questions.",
+      followUp: ["How do I get started?", "How do deposits work?"],
+    },
   },
 ];
 
-function getBotResponse(input: string): string {
-  const lower = input.toLowerCase().trim();
-  
-  // Check for greetings
-  if (/^(hi|hello|hey|good morning|good afternoon|good evening|howdy|sup)/.test(lower)) {
-    return "Hello! 👋 Welcome to GoldBridge Capital. I'm here to help you with:\n\n• Investment packages & returns\n• Deposits & withdrawals\n• Account & KYC verification\n• General questions\n\nWhat would you like to know?";
+function getCurrentTime() {
+  return new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+}
+
+function normalizeInput(input: string) {
+  return input.toLowerCase().replace(/[^\w\s-]/g, " ").replace(/\s+/g, " ").trim();
+}
+
+function getBotReply(input: string): BotReply {
+  const normalized = normalizeInput(input);
+
+  if (!normalized) {
+    return {
+      content: "Please type a question and I will point you to the most relevant information.",
+      followUp: ["How do I get started?", "How do deposits work?"],
+    };
   }
-  
-  // Check for thanks
-  if (/thank|thanks|thx|appreciate/.test(lower)) {
-    return "You're welcome! 😊 Is there anything else I can help you with? Feel free to ask about investments, withdrawals, or anything else.";
+
+  if (/(thank|thanks|appreciate)/.test(normalized)) {
+    return {
+      content: "You are welcome. If you want, ask about deposits, withdrawals, tiers, risks, or onboarding.",
+      followUp: ["How do withdrawals work?", "What risks are involved?"],
+    };
   }
-  
-  // Check for goodbye
-  if (/bye|goodbye|see you|later|exit|quit/.test(lower)) {
-    return "Goodbye! 👋 Thanks for chatting with GoldBridge. We're here 24/7 whenever you need us. Happy investing! 💰";
+
+  if (/(bye|goodbye|see you|later|exit|quit)/.test(normalized)) {
+    return {
+      content: "You can return anytime if you need help with Gold Bridge Capital information or onboarding guidance.",
+    };
   }
-  
-  // Find best matching keyword response
-  let bestMatch: KeywordResponse | null = null;
-  let maxMatches = 0;
-  
-  for (const kr of keywordResponses) {
-    const matches = kr.keywords.filter(kw => lower.includes(kw)).length;
-    if (matches > maxMatches) {
-      maxMatches = matches;
-      bestMatch = kr;
+
+  let bestMatch: KnowledgeItem | null = null;
+  let bestScore = 0;
+
+  for (const item of knowledgeBase) {
+    const score = item.keywords.reduce((total, keyword) => {
+      return total + (normalized.includes(keyword) ? keyword.split(" ").length : 0);
+    }, 0);
+
+    if (score > bestScore) {
+      bestScore = score;
+      bestMatch = item;
     }
   }
-  
-  if (bestMatch && maxMatches > 0) {
-    return bestMatch.response;
+
+  if (bestMatch) {
+    return bestMatch.reply;
   }
-  
-  // Default response with suggestions
-  return "I'm not sure I understood that, but I'm here to help! 🤔\n\nTry asking about:\n• How to start investing\n• Weekly returns & payouts\n• Withdrawals & bank transfers\n• KYC verification\n• Payment methods\n\nOr type 'support' to contact our team directly.";
+
+  return {
+    content:
+      "I can help with onboarding, deposits, withdrawals, tiers, risks, KYC, and general platform questions. Try asking something more specific.",
+    followUp: fallbackPrompts,
+  };
 }
 
 export default function Chatbot() {
@@ -146,8 +222,10 @@ export default function Chatbot() {
     {
       id: 1,
       role: "bot",
-      content: "Hi there! 👋 I'm your GoldBridge assistant. How can I help you today?",
-      time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+      content:
+        "Welcome to Gold Bridge Capital. Ask about onboarding, deposits, withdrawals, KYC, investment tiers, or platform risks.",
+      time: getCurrentTime(),
+      followUp: quickReplies.slice(0, 3),
     },
   ]);
   const [input, setInput] = useState("");
@@ -155,45 +233,49 @@ export default function Chatbot() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
-
-  useEffect(() => {
-    scrollToBottom();
+  const activeSuggestions = useMemo(() => {
+    const latestBotMessage = [...messages].reverse().find((message) => message.role === "bot");
+    return latestBotMessage?.followUp?.length ? latestBotMessage.followUp : quickReplies.slice(0, 4);
   }, [messages]);
 
   useEffect(() => {
-    if (isOpen && inputRef.current) {
-      inputRef.current.focus();
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages, isTyping]);
+
+  useEffect(() => {
+    if (isOpen) {
+      inputRef.current?.focus();
     }
   }, [isOpen]);
 
   const sendMessage = (text: string) => {
-    if (!text.trim()) return;
+    const trimmed = text.trim();
+    if (!trimmed) return;
 
     const userMsg: Message = {
       id: Date.now(),
       role: "user",
-      content: text.trim(),
-      time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+      content: trimmed,
+      time: getCurrentTime(),
     };
 
     setMessages((prev) => [...prev, userMsg]);
     setInput("");
     setIsTyping(true);
 
-    // Simulate bot typing delay
-    setTimeout(() => {
+    window.setTimeout(() => {
+      const reply = getBotReply(trimmed);
       const botMsg: Message = {
         id: Date.now() + 1,
         role: "bot",
-        content: getBotResponse(text),
-        time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+        content: reply.content,
+        time: getCurrentTime(),
+        followUp: reply.followUp,
       };
+
       setMessages((prev) => [...prev, botMsg]);
       setIsTyping(false);
-    }, 800 + Math.random() * 700);
+    }, 520);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -203,7 +285,6 @@ export default function Chatbot() {
 
   return (
     <>
-      {/* Floating Button */}
       <AnimatePresence>
         {!isOpen && (
           <motion.button
@@ -215,13 +296,11 @@ export default function Chatbot() {
             aria-label="Open chat"
           >
             <MessageCircle size={22} className="text-[#060608]" />
-            {/* Notification dot */}
             <span className="absolute top-0 right-0 w-3 h-3 bg-emerald-400 rounded-full border-2 border-[#060608]" />
           </motion.button>
         )}
       </AnimatePresence>
 
-      {/* Chat Panel */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
@@ -229,9 +308,8 @@ export default function Chatbot() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 16 }}
             transition={{ duration: 0.15, ease: "easeOut" }}
-            className="fixed bottom-14 right-0 md:bottom-16 md:right-6 z-50 w-full md:w-[380px] h-[60vh] md:h-[500px] max-h-[500px] bg-[#0a0a0e] border border-white/[0.06] md:rounded-2xl rounded-t-2xl shadow-2xl shadow-black/50 flex flex-col overflow-hidden"
+            className="fixed bottom-14 right-0 md:bottom-16 md:right-6 z-50 w-full md:w-[390px] h-[60vh] md:h-[540px] max-h-[540px] bg-[#0a0a0e] border border-white/[0.06] md:rounded-2xl rounded-t-2xl shadow-2xl shadow-black/50 flex flex-col overflow-hidden"
           >
-            {/* Header */}
             <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.06] bg-[#09090c]">
               <div className="flex items-center gap-3">
                 <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#D4AF37]/20 to-[#D4AF37]/5 border border-[#D4AF37]/20 flex items-center justify-center">
@@ -254,7 +332,12 @@ export default function Chatbot() {
               </button>
             </div>
 
-            {/* Messages */}
+            <div className="px-4 py-3 border-b border-white/[0.04] bg-[#0c0c10]">
+              <p className="text-[#777] text-[11px] leading-relaxed">
+                Quick guidance for common questions. For account-specific actions, use the platform flow or official support channels.
+              </p>
+            </div>
+
             <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-thin">
               {messages.map((msg) => (
                 <div
@@ -275,7 +358,7 @@ export default function Chatbot() {
                     )}
                   </div>
                   <div
-                    className={`max-w-[75%] px-3.5 py-2.5 rounded-2xl ${
+                    className={`max-w-[78%] px-3.5 py-2.5 rounded-2xl ${
                       msg.role === "bot"
                         ? "bg-white/[0.04] rounded-tl-sm"
                         : "bg-[#D4AF37]/10 rounded-tr-sm"
@@ -289,7 +372,6 @@ export default function Chatbot() {
                 </div>
               ))}
 
-              {/* Typing indicator */}
               {isTyping && (
                 <div className="flex gap-2.5">
                   <div className="w-7 h-7 rounded-full bg-[#D4AF37]/10 border border-[#D4AF37]/20 flex items-center justify-center">
@@ -308,43 +390,24 @@ export default function Chatbot() {
               <div ref={messagesEndRef} />
             </div>
 
-            {/* Quick Replies */}
-            {messages.length < 4 && (
-              <div className="px-4 pb-2">
-                <p className="text-[#444] text-[9px] mb-2 uppercase tracking-wider">Quick questions:</p>
-                <div className="flex gap-2 flex-wrap">
-                  {quickReplies.slice(0, 4).map((reply) => (
-                    <button
-                      key={reply}
-                      onClick={() => sendMessage(reply)}
-                      className="text-[10px] px-3 py-1.5 rounded-full bg-white/[0.03] border border-white/[0.06] text-[#888] hover:border-[#D4AF37]/30 hover:text-[#D4AF37] transition-colors"
-                    >
-                      {reply}
-                    </button>
-                  ))}
-                </div>
+            <div className="px-4 pb-2">
+              <p className="text-[#444] text-[9px] mb-2 uppercase tracking-wider">
+                Suggested questions
+              </p>
+              <div className="flex gap-2 flex-wrap">
+                {activeSuggestions.slice(0, 4).map((prompt) => (
+                  <button
+                    key={prompt}
+                    type="button"
+                    onClick={() => sendMessage(prompt)}
+                    className="text-[10px] px-3 py-1.5 rounded-full bg-white/[0.03] border border-white/[0.06] text-[#888] hover:border-[#D4AF37]/30 hover:text-[#D4AF37] transition-colors"
+                  >
+                    {prompt}
+                  </button>
+                ))}
               </div>
-            )}
-            
-            {/* Suggested Questions after some messages */}
-            {messages.length >= 4 && messages.length < 8 && (
-              <div className="px-4 pb-2">
-                <p className="text-[#444] text-[9px] mb-2 uppercase tracking-wider">You might also ask:</p>
-                <div className="flex gap-2 flex-wrap">
-                  {suggestedQuestions.slice(0, 3).map((q) => (
-                    <button
-                      key={q}
-                      onClick={() => sendMessage(q)}
-                      className="text-[10px] px-3 py-1.5 rounded-full bg-[#D4AF37]/[0.05] border border-[#D4AF37]/[0.15] text-[#D4AF37]/80 hover:bg-[#D4AF37]/[0.1] transition-colors"
-                    >
-                      {q}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
+            </div>
 
-            {/* Input */}
             <form onSubmit={handleSubmit} className="p-3 border-t border-white/[0.06] bg-[#09090c]">
               <div className="flex gap-2">
                 <input
@@ -352,7 +415,7 @@ export default function Chatbot() {
                   type="text"
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
-                  placeholder="Type a message..."
+                  placeholder="Ask about deposits, tiers, withdrawals, KYC..."
                   className="flex-1 bg-white/[0.03] border border-white/[0.06] rounded-xl px-4 py-2.5 text-white text-sm placeholder:text-[#444] outline-none focus:border-[#D4AF37]/30 transition-colors"
                 />
                 <button
