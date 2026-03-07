@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowUpRight, Shield, TrendingUp } from "lucide-react";
+import { ArrowUpRight, CirclePlay, Shield, TrendingUp } from "lucide-react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef, useState, useEffect } from "react";
 import Marquee from "./Marquee";
@@ -154,6 +154,53 @@ export default function Hero() {
           <a href="/about" className="btn-outline gap-2 px-8 py-3 text-sm w-full sm:w-auto justify-center">
             Learn More
           </a>
+        </motion.div>
+
+        {/* Hero video */}
+        <motion.div
+          className="max-w-5xl mx-auto mb-14 md:mb-16"
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 1.0, duration: 0.8 }}
+        >
+          <div className="glass-gold p-3 md:p-4">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 px-2 md:px-3 pb-3 md:pb-4">
+              <div>
+                <p className="text-[#D4AF37] text-[10px] uppercase tracking-[0.3em] mb-1">
+                  Featured Introduction
+                </p>
+                <h3 className="text-white text-base md:text-lg font-display font-semibold">
+                  Hear the Goldbridge story directly
+                </h3>
+              </div>
+              <div className="inline-flex items-center self-start sm:self-auto rounded-full border border-white/[0.08] bg-white/[0.03] px-3 py-1.5">
+                <CirclePlay size={14} className="text-[#D4AF37]" />
+              </div>
+            </div>
+
+            <div className="relative overflow-hidden rounded-[24px] border border-white/[0.08] bg-[#020203] shadow-[0_30px_80px_rgba(0,0,0,0.45)]">
+              <div className="pointer-events-none absolute inset-x-0 top-0 z-10 h-20 bg-gradient-to-b from-black/30 to-transparent" />
+              <div className="relative w-full overflow-hidden pt-[56.25%] bg-black">
+                <iframe
+                  src="https://player.vimeo.com/video/1171206958?title=0&byline=0&portrait=0"
+                  title="Goldbridge Capital introduction video"
+                  allow="autoplay; fullscreen; picture-in-picture"
+                  allowFullScreen
+                  className="absolute inset-0 h-full w-full"
+                />
+              </div>
+            </div>
+
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 px-2 md:px-3 pt-3 md:pt-4">
+              <p className="text-[#666] text-xs md:text-sm leading-relaxed max-w-2xl">
+                A concise introduction to Goldbridge Capital, our investment structure,
+                and how participation works across the platform.
+              </p>
+              <p className="text-[#444] text-[10px] uppercase tracking-[0.24em]">
+                Source: Vimeo
+              </p>
+            </div>
+          </div>
         </motion.div>
 
         {/* Stats row */}
