@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useMemo } from "react";
+import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import {
   ArrowLeft, Check, ArrowUpRight, Copy, Wallet,
@@ -52,11 +53,17 @@ const currencies = [
   { code: "BTC", symbol: "₿", name: "Bitcoin", flag: "₿", rate: 0.0000005 },
 ];
 
-const cryptoWallets = [
-  { id: "btc", name: "Bitcoin", symbol: "BTC", address: "bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh", network: "Bitcoin Network", icon: "₿", color: "text-orange-400", bgColor: "bg-orange-500/10", borderColor: "border-orange-500/20" },
-  { id: "eth", name: "Ethereum", symbol: "ETH", address: "0x742d35Cc6634C0532925a3b844Bc9e7595f2bD18", network: "ERC-20 Network", icon: "Ξ", color: "text-blue-400", bgColor: "bg-blue-500/10", borderColor: "border-blue-500/20" },
-  { id: "usdt", name: "USDT", symbol: "USDT", address: "TQn9Y2khEsLJW1ChNWShFYKwxhA5sR7CiB", network: "TRC-20 Network", icon: "₮", color: "text-emerald-400", bgColor: "bg-emerald-500/10", borderColor: "border-emerald-500/20" },
-];
+const DEPOSIT_WALLET = {
+  id: "usdt",
+  name: "USDT (ERC-20)",
+  symbol: "USDT",
+  address: "0x742d35Cc6634C0532925a3b844Bc9e7595f2bD18",
+  network: "ERC-20 Network",
+  icon: "₮",
+  color: "text-emerald-400",
+  bgColor: "bg-emerald-500/10",
+  borderColor: "border-emerald-500/20",
+};
 
 interface StoredInvestment {
   id: string;
@@ -87,10 +94,10 @@ function formatCurrency(amount: number, symbol: string = "R") {
 }
 
 export default function InvestPage() {
+  const router = useRouter();
   const { user, isLoading } = useAuth();
   const [amount, setAmount] = useState<string>("");
   const [selectedCurrency, setSelectedCurrency] = useState(0);
-  const [selectedWallet, setSelectedWallet] = useState(0);
   const [copiedAddress, setCopiedAddress] = useState(false);
   const [showCurrencyDropdown, setShowCurrencyDropdown] = useState(false);
   const [step, setStep] = useState<"select" | "confirm" | "success">("select");
@@ -98,9 +105,9 @@ export default function InvestPage() {
 
   useEffect(() => {
     if (!isLoading && !user) {
-      window.location.href = "/";
+      router.replace("/");
     }
-  }, [user, isLoading]);
+  }, [user, isLoading, router]);
 
   const currency = currencies[selectedCurrency];
   const amountNum = Number(amount) || 0;
@@ -173,7 +180,7 @@ export default function InvestPage() {
       amount: amountNum,
       currency: currency.code,
       amountZAR: Math.round(amountZAR),
-      paymentMethod: cryptoWallets[selectedWallet].symbol,
+      paymentMethod: DEPOSIT_WALLET.symbol,
       date: new Date().toISOString().split("T")[0],
       status: "Active",
     };
@@ -384,37 +391,30 @@ export default function InvestPage() {
                     })}
                   </div>
 
-                  {/* Crypto Wallet Selection */}
-                  <h4 className="text-[#555] text-[10px] uppercase tracking-[0.2em] mb-3">Send Payment Via Crypto</h4>
-                  <div className="grid grid-cols-3 gap-2 mb-4">
-                    {cryptoWallets.map((w, i) => (
-                      <button
-                        key={w.id}
-                        onClick={() => { setSelectedWallet(i); setCopiedAddress(false); }}
-                        className={`flex flex-col items-center gap-1.5 p-3 rounded-xl border transition-all ${
-                          selectedWallet === i
-                            ? `${w.bgColor} ${w.borderColor} ${w.color}`
-                            : "bg-white/[0.02] border-white/[0.06] text-[#666] hover:border-white/[0.1]"
-                        }`}
-                      >
-                        <span className="text-lg font-bold">{w.icon}</span>
-                        <span className="text-[10px] font-semibold">{w.symbol}</span>
-                      </button>
-                    ))}
+                  {/* ERC-20 USDT Payment */}
+                  <h4 className="text-[#555] text-[10px] uppercase tracking-[0.2em] mb-3">Send Payment Via USDT (ERC-20)</h4>
+                  <div className="flex items-center gap-2 mb-4 p-3 bg-emerald-500/[0.04] border border-emerald-500/[0.12] rounded-xl">
+                    <div className="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
+                      <span className="text-emerald-400 text-sm font-bold">₮</span>
+                    </div>
+                    <div>
+                      <p className="text-white text-xs font-semibold">USDT — Tether</p>
+                      <p className="text-emerald-400 text-[10px] font-medium">ERC-20 Network Only</p>
+                    </div>
                   </div>
 
                   {/* Wallet Address */}
                   <div className="mb-5">
                     <div className="relative">
                       <div className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-3 pr-11">
-                        <p className="text-[#888] text-[9px] mb-1">{cryptoWallets[selectedWallet].name} — {cryptoWallets[selectedWallet].network}</p>
+                        <p className="text-[#888] text-[9px] mb-1">{DEPOSIT_WALLET.name} — {DEPOSIT_WALLET.network}</p>
                         <p className="text-white text-[10px] font-mono break-all leading-relaxed">
-                          {cryptoWallets[selectedWallet].address}
+                          {DEPOSIT_WALLET.address}
                         </p>
                       </div>
                       <button
                         onClick={() => {
-                          navigator.clipboard.writeText(cryptoWallets[selectedWallet].address);
+                          navigator.clipboard.writeText(DEPOSIT_WALLET.address);
                           setCopiedAddress(true);
                           setTimeout(() => setCopiedAddress(false), 2000);
                         }}
@@ -428,7 +428,7 @@ export default function InvestPage() {
                       </button>
                     </div>
                     <p className="text-[#444] text-[8px] mt-1.5">
-                      Send your crypto to this address, then confirm your investment. Our admin team will verify the payment.
+                      Only send <span className="text-emerald-400">USDT</span> on the <span className="text-white">Ethereum (ERC-20)</span> network. Sending other tokens may result in permanent loss.
                     </p>
                   </div>
 
@@ -551,7 +551,7 @@ export default function InvestPage() {
                   </div>
                   <div className="flex items-center justify-between py-3 border-b border-white/[0.04]">
                     <span className="text-[#555] text-xs">Payment Method</span>
-                    <span className={`text-sm font-semibold ${cryptoWallets[selectedWallet].color}`}>{cryptoWallets[selectedWallet].name} ({cryptoWallets[selectedWallet].symbol})</span>
+                    <span className="text-sm font-semibold text-emerald-400">{DEPOSIT_WALLET.name}</span>
                   </div>
                   <div className="flex items-center justify-between py-3 border-b border-white/[0.04]">
                     <span className="text-[#555] text-xs">Weekly Return (est.)</span>

@@ -182,10 +182,13 @@ export default function Hero() {
               <div className="pointer-events-none absolute inset-x-0 top-0 z-10 h-20 bg-gradient-to-b from-black/30 to-transparent" />
               <div className="relative w-full overflow-hidden pt-[56.25%] bg-black">
                 <iframe
-                  src="https://player.vimeo.com/video/1171206958?title=0&byline=0&portrait=0"
+                  src="https://player.vimeo.com/video/1171206958?title=0&byline=0&portrait=0&background=0"
                   title="Goldbridge Capital introduction video"
                   allow="autoplay; fullscreen; picture-in-picture"
                   allowFullScreen
+                  frameBorder="0"
+                  loading="lazy"
+                  style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%" }}
                   className="absolute inset-0 h-full w-full"
                 />
               </div>

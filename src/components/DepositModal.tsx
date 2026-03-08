@@ -10,45 +10,20 @@ interface DepositModalProps {
   onClose: () => void;
 }
 
-const cryptoWallets = [
-  {
-    id: "btc",
-    name: "Bitcoin",
-    symbol: "BTC",
-    address: "bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh",
-    network: "Bitcoin Network",
-    color: "text-orange-400",
-    bgColor: "bg-orange-500/10",
-    borderColor: "border-orange-500/20",
-    icon: "₿",
-  },
-  {
-    id: "eth",
-    name: "Ethereum",
-    symbol: "ETH",
-    address: "0x742d35Cc6634C0532925a3b844Bc9e7595f2bD18",
-    network: "ERC-20 Network",
-    color: "text-blue-400",
-    bgColor: "bg-blue-500/10",
-    borderColor: "border-blue-500/20",
-    icon: "Ξ",
-  },
-  {
-    id: "usdt",
-    name: "USDT",
-    symbol: "USDT",
-    address: "TQn9Y2khEsLJW1ChNWShFYKwxhA5sR7CiB",
-    network: "TRC-20 Network",
-    color: "text-emerald-400",
-    bgColor: "bg-emerald-500/10",
-    borderColor: "border-emerald-500/20",
-    icon: "₮",
-  },
-];
+const DEPOSIT_WALLET = {
+  id: "usdt",
+  name: "USDT (ERC-20)",
+  symbol: "USDT",
+  address: "0x742d35Cc6634C0532925a3b844Bc9e7595f2bD18",
+  network: "ERC-20 Network",
+  color: "text-emerald-400",
+  bgColor: "bg-emerald-500/10",
+  borderColor: "border-emerald-500/20",
+  icon: "₮",
+};
 
 export default function DepositModal({ isOpen, onClose }: DepositModalProps) {
   const { user } = useAuth();
-  const [selectedWallet, setSelectedWallet] = useState(0);
   const [copiedAddress, setCopiedAddress] = useState(false);
   const [step, setStep] = useState<"select" | "confirm">("select");
   const [amount, setAmount] = useState("");
@@ -56,11 +31,10 @@ export default function DepositModal({ isOpen, onClose }: DepositModalProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
-  const wallet = cryptoWallets[selectedWallet];
+  const wallet = DEPOSIT_WALLET;
 
   const reset = () => {
     setStep("select");
-    setSelectedWallet(0);
     setCopiedAddress(false);
     setAmount("");
     setTxHash("");
@@ -179,7 +153,7 @@ export default function DepositModal({ isOpen, onClose }: DepositModalProps) {
                         Deposit Funds
                       </h2>
                       <p className="text-[#555] text-xs">
-                        Send crypto to one of our wallets below
+                        Send USDT via ERC-20 network
                       </p>
                     </div>
                   </div>
@@ -189,39 +163,28 @@ export default function DepositModal({ isOpen, onClose }: DepositModalProps) {
                     <div className="flex items-start gap-2">
                       <AlertCircle size={14} className="text-[#D4AF37] mt-0.5 flex-shrink-0" />
                       <p className="text-[#888] text-[10px] leading-relaxed">
-                        Send cryptocurrency to the wallet address below. After sending, enter the amount and submit. Our team will verify and credit your account.
+                        Send <span className="text-emerald-400 font-semibold">USDT (ERC-20)</span> to the wallet address below. After sending, enter the amount and submit. Our team will verify and credit your account.
                       </p>
                     </div>
                   </div>
 
-                  {/* Wallet Selection */}
+                  {/* ERC-20 Badge */}
                   <div className="mb-5">
-                    <label className="text-[#555] text-[10px] uppercase tracking-[0.2em] mb-2 block">
-                      Select Cryptocurrency
-                    </label>
-                    <div className="grid grid-cols-3 gap-2">
-                      {cryptoWallets.map((w, i) => (
-                        <button
-                          key={w.id}
-                          onClick={() => { setSelectedWallet(i); setCopiedAddress(false); }}
-                          className={`flex flex-col items-center gap-1.5 p-3 rounded-xl border transition-all ${
-                            selectedWallet === i
-                              ? `${w.bgColor} ${w.borderColor} ${w.color}`
-                              : "bg-white/[0.02] border-white/[0.06] text-[#666] hover:border-white/[0.1]"
-                          }`}
-                        >
-                          <span className="text-lg font-bold">{w.icon}</span>
-                          <span className="text-[10px] font-semibold">{w.symbol}</span>
-                          <span className="text-[8px] opacity-60">{w.network}</span>
-                        </button>
-                      ))}
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
+                        <span className="text-emerald-400 text-sm font-bold">₮</span>
+                      </div>
+                      <div>
+                        <p className="text-white text-xs font-semibold">USDT — Tether</p>
+                        <p className="text-emerald-400 text-[10px] font-medium">ERC-20 Network Only</p>
+                      </div>
                     </div>
                   </div>
 
                   {/* Wallet Address */}
                   <div className="mb-5">
                     <label className="text-[#555] text-[10px] uppercase tracking-[0.2em] mb-2 block">
-                      {wallet.name} Wallet Address
+                      USDT (ERC-20) Deposit Address
                     </label>
                     <div className="relative">
                       <div className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-3.5 pr-12">
@@ -241,7 +204,7 @@ export default function DepositModal({ isOpen, onClose }: DepositModalProps) {
                       </button>
                     </div>
                     <p className="text-[#444] text-[9px] mt-1.5">
-                      Only send <span className={wallet.color}>{wallet.symbol}</span> on the <span className="text-white">{wallet.network}</span>. Sending other assets may result in permanent loss.
+                      Only send <span className="text-emerald-400">USDT</span> on the <span className="text-white">Ethereum (ERC-20)</span> network. Sending other tokens or using a different network may result in <span className="text-red-400">permanent loss of funds</span>.
                     </p>
                   </div>
 

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import {
   LayoutDashboard, Users, Wallet, ArrowUpRight, ArrowDownRight,
@@ -173,11 +174,13 @@ export default function AdminPage() {
   const [withdrawalFilter, setWithdrawalFilter] = useState<"all" | "pending" | "processing" | "completed" | "rejected">("all");
   const [refreshKey, setRefreshKey] = useState(0);
 
+  const router = useRouter();
+
   useEffect(() => {
     if (!isLoading && (!user || !isAdmin)) {
-      window.location.href = "/";
+      router.replace("/dashboard");
     }
-  }, [user, isLoading, isAdmin]);
+  }, [user, isLoading, isAdmin, router]);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -259,7 +262,7 @@ export default function AdminPage() {
 
   const handleLogout = () => {
     logout();
-    window.location.href = "/";
+    router.replace("/");
   };
 
   return (
@@ -297,6 +300,13 @@ export default function AdminPage() {
               )}
             </button>
           ))}
+          <a
+            href="/dashboard"
+            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-medium transition-all duration-200 text-[#555] hover:text-[#D4AF37] hover:bg-[#D4AF37]/[0.04] border border-transparent mt-3"
+          >
+            <ArrowLeft size={15} />
+            Back to Dashboard
+          </a>
         </nav>
 
         <div className="border-t border-white/[0.04] p-4">

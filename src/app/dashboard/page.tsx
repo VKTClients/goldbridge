@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import {
   LayoutDashboard, Wallet, ArrowUpRight, ArrowDownRight, Clock,
@@ -169,7 +170,8 @@ function PortfolioChart({ data }: { data: { week: string; value: number }[] }) {
 }
 
 export default function DashboardPage() {
-  const { user, isLoading, logout } = useAuth();
+  const router = useRouter();
+  const { user, isLoading, logout, isAdmin } = useAuth();
   const [activeTab, setActiveTab] = useState<TabKey>("overview");
   const [showNotifications, setShowNotifications] = useState(false);
   const [copiedRef, setCopiedRef] = useState(false);
@@ -178,6 +180,7 @@ export default function DashboardPage() {
   const [showKYCModal, setShowKYCModal] = useState(false);
   const [showWithdrawModal, setShowWithdrawModal] = useState(false);
   const [showDepositModal, setShowDepositModal] = useState(false);
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const investments = mockInvestments;
 
   const referralCode = user ? `GB-${user.name.replace(/\s/g, "").toUpperCase().slice(0, 4)}-${Math.random().toString(36).slice(2, 6).toUpperCase()}` : "";
@@ -185,10 +188,22 @@ export default function DashboardPage() {
 
   useEffect(() => {
     if (!isLoading && !user) {
-      window.location.href = "/";
+      router.replace("/");
     }
-  }, [user, isLoading]);
+  }, [user, isLoading, router]);
 
+  // Prevent accidental back-button navigation away from dashboard
+  useEffect(() => {
+    if (!user) return;
+    const handlePopState = () => {
+      // Push state back so user stays on dashboard
+      window.history.pushState(null, "", window.location.href);
+      setShowLogoutConfirm(true);
+    };
+    window.history.pushState(null, "", window.location.href);
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
+  }, [user]);
 
   if (isLoading || !user) {
     return (
@@ -208,7 +223,7 @@ export default function DashboardPage() {
 
   const handleLogout = () => {
     logout();
-    window.location.href = "/";
+    router.replace("/");
   };
 
   const copyReferral = () => {
@@ -231,6 +246,55 @@ export default function DashboardPage() {
         isOpen={showDepositModal}
         onClose={() => setShowDepositModal(false)}
       />
+
+      {/* Logout Confirmation Modal */}
+      <AnimatePresence>
+        {showLogoutConfirm && (
+          <motion.div
+            className="fixed inset-0 z-[100] flex items-center justify-center p-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <motion.div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => setShowLogoutConfirm(false)} />
+            <motion.div
+              className="relative w-full max-w-[360px] bg-[#0a0a0e] border border-white/[0.06] rounded-2xl shadow-2xl p-6 text-center"
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+            >
+              <div className="w-12 h-12 rounded-full bg-amber-500/10 border border-amber-500/20 flex items-center justify-center mx-auto mb-4">
+                <LogOut size={20} className="text-amber-400" />
+              </div>
+              <h3 className="text-white text-base font-display font-semibold mb-2">Leave Dashboard?</h3>
+              <p className="text-[#555] text-xs mb-5 leading-relaxed">
+                Would you like to sign out or go back to the homepage?
+              </p>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowLogoutConfirm(false)}
+                  className="flex-1 py-2.5 text-sm font-medium text-[#888] border border-white/[0.06] rounded-xl hover:bg-white/[0.03] transition-colors"
+                >
+                  Stay
+                </button>
+                <button
+                  onClick={() => { setShowLogoutConfirm(false); router.push("/"); }}
+                  className="flex-1 py-2.5 text-sm font-medium text-white bg-white/[0.06] border border-white/[0.06] rounded-xl hover:bg-white/[0.1] transition-colors"
+                >
+                  Home
+                </button>
+                <button
+                  onClick={() => { setShowLogoutConfirm(false); handleLogout(); }}
+                  className="flex-1 py-2.5 text-sm font-medium text-red-400 bg-red-500/[0.06] border border-red-500/[0.12] rounded-xl hover:bg-red-500/[0.1] transition-colors"
+                >
+                  Sign Out
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
     <div className="min-h-screen bg-[#060608] flex">
       {/* Sidebar — Desktop */}
       <aside className="hidden md:flex flex-col w-[240px] bg-[#09090c] border-r border-white/[0.04] fixed top-0 left-0 h-screen z-40">
@@ -259,6 +323,15 @@ export default function DashboardPage() {
               {item.label}
             </button>
           ))}
+          {isAdmin && (
+            <a
+              href="/admin"
+              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-medium transition-all duration-200 text-[#D4AF37]/70 hover:text-[#D4AF37] hover:bg-[#D4AF37]/[0.04] border border-transparent mt-3"
+            >
+              <Shield size={15} />
+              Admin Panel
+            </a>
+          )}
         </nav>
 
         {/* Referral CTA in sidebar */}
@@ -331,6 +404,15 @@ export default function DashboardPage() {
               {item.label}
             </button>
           ))}
+          {isAdmin && (
+            <a
+              href="/admin"
+              className="flex-1 flex flex-col items-center gap-1 py-2.5 text-[9px] font-medium text-[#D4AF37]/60"
+            >
+              <Shield size={14} />
+              Admin
+            </a>
+          )}
         </div>
       </div>
 
