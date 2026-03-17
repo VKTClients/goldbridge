@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import {
   LayoutDashboard, Users, Wallet, ArrowUpRight, ArrowDownRight,
@@ -104,6 +105,7 @@ const sidebarItems: { key: AdminTab; label: string; icon: typeof LayoutDashboard
 
 export default function AdminPage() {
   const { user, isLoading, isAdmin, getAllUsers, logout } = useAuth();
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState<AdminTab>("overview");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedClient, setSelectedClient] = useState<ClientUser | null>(null);
@@ -195,7 +197,7 @@ export default function AdminPage() {
 
   const handleLogout = () => {
     logout();
-    window.location.href = "/";
+    router.replace("/");
   };
 
   return (

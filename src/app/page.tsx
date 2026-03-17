@@ -11,6 +11,7 @@ import InvestmentCalculator from "@/components/InvestmentCalculator";
 import Plans from "@/components/Plans";
 import Testimonials from "@/components/Testimonials";
 import WhyTrustUs from "@/components/WhyTrustUs";
+import FAQ from "@/components/FAQ";
 import CTA from "@/components/CTA";
 import MarketTicker from "@/components/MarketTicker";
 import Footer from "@/components/Footer";
@@ -46,6 +47,7 @@ export default function Home() {
         <Plans />
         <WhyTrustUs />
         <Testimonials />
+        <FAQ />
         <Newsletter />
         <CTA />
         <Footer />

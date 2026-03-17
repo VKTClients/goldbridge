@@ -152,7 +152,7 @@ export default function DepositModal({ isOpen, onClose }: DepositModalProps) {
                         Deposit Funds
                       </h2>
                       <p className="text-[#555] text-xs">
-                        Send crypto to one of our wallets below
+                        Send USDT via ERC-20 network
                       </p>
                     </div>
                   </div>
@@ -162,7 +162,7 @@ export default function DepositModal({ isOpen, onClose }: DepositModalProps) {
                     <div className="flex items-start gap-2">
                       <AlertCircle size={14} className="text-[#D4AF37] mt-0.5 flex-shrink-0" />
                       <p className="text-[#888] text-[10px] leading-relaxed">
-                        Send cryptocurrency to the wallet address below. After sending, enter the amount and submit. Our team will verify and credit your account.
+                        Send <span className="text-emerald-400 font-semibold">USDT (ERC-20)</span> to the wallet address below. After sending, enter the amount and submit. Our team will verify and credit your account.
                       </p>
                     </div>
                   </div>

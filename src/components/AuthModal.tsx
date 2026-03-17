@@ -1,11 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { X, Eye, EyeOff, ArrowRight, User, Mail, Lock } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/context/AuthContext";
 
 export default function AuthModal() {
+  const router = useRouter();
   const { showAuthModal, setShowAuthModal, login, signup } = useAuth();
   const [mode, setMode] = useState<"login" | "signup">("login");
   const [name, setName] = useState("");
@@ -62,7 +64,7 @@ export default function AuthModal() {
 
       if (success) {
         reset();
-        window.location.href = "/dashboard";
+        router.push("/dashboard");
       }
     } catch {
       setError("Something went wrong. Please try again.");

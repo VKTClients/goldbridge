@@ -38,6 +38,7 @@ export default function Footer() {
             <a href="#home" className="text-[#444] text-xs sm:text-[11px] hover:text-[#D4AF37] active:text-[#D4AF37] transition-colors py-1">Home</a>
             <a href="#markets" className="text-[#444] text-xs sm:text-[11px] hover:text-[#D4AF37] active:text-[#D4AF37] transition-colors py-1">Markets</a>
             <a href="#pricing" className="text-[#444] text-xs sm:text-[11px] hover:text-[#D4AF37] active:text-[#D4AF37] transition-colors py-1">Pricing</a>
+            <a href="#faq" className="text-[#444] text-xs sm:text-[11px] hover:text-[#D4AF37] active:text-[#D4AF37] transition-colors py-1">FAQs</a>
             <a href="/privacy" className="text-[#444] text-xs sm:text-[11px] hover:text-[#D4AF37] active:text-[#D4AF37] transition-colors py-1">Privacy</a>
             <a href="/terms" className="text-[#444] text-xs sm:text-[11px] hover:text-[#D4AF37] active:text-[#D4AF37] transition-colors py-1">Terms</a>
           </div>

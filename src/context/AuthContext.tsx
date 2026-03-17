@@ -63,7 +63,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (existing && existing.password !== password) return false;
 
     const role = ADMIN_EMAILS.includes(email.toLowerCase()) ? "admin" : "user";
-
     const userData: User = {
       email,
       name: existing?.name || email.split("@")[0],
@@ -73,6 +72,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
 
     localStorage.setItem("gb_user", JSON.stringify(userData));
+    localStorage.setItem(`gb_user_profile_${email}`, JSON.stringify(userData));
     setUser(userData);
     setShowAuthModal(false);
     return true;
@@ -110,6 +110,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!user) return;
     const updatedUser = { ...user, kycStatus: status, kycDocuments: documents || user.kycDocuments };
     localStorage.setItem("gb_user", JSON.stringify(updatedUser));
+    localStorage.setItem(`gb_user_profile_${user.email}`, JSON.stringify(updatedUser));
     setUser(updatedUser);
   };
 
