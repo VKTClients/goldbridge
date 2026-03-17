@@ -1,6 +1,5 @@
 // Hybrid Free Market Data Service
-// Uses CoinGecko (crypto) + Yahoo Finance (stocks/forex) + Fallback
-// Replaces Alpha Vantage to reduce costs to $0
+// Combines CoinGecko (crypto) + Yahoo Finance (stocks/forex) + Fallback
 
 export interface MarketData {
   symbol: string;
@@ -9,7 +8,7 @@ export interface MarketData {
   up: boolean;
 }
 
-// CoinGecko API for crypto data (free - 10k calls/month)
+// CoinGecko API for crypto data
 const COINGECKO_BASE = 'https://api.coingecko.com/api/v3';
 
 // Yahoo Finance API for stocks/forex (unofficial but free)
@@ -41,16 +40,6 @@ export const fallbackMarketData: MarketData[] = [
   { symbol: 'BNB/USD', price: '658.45', change: '+0.72%', up: true },
   { symbol: 'ADA/USD', price: '0.7845', change: '+1.24%', up: true },
   { symbol: 'DOGE/USD', price: '0.2456', change: '+4.52%', up: true },
-  { symbol: 'DOT/USD', price: '7.82', change: '+1.86%', up: true },
-  { symbol: 'LINK/USD', price: '18.45', change: '+2.14%', up: true },
-  { symbol: 'AVAX/USD', price: '38.92', change: '+1.68%', up: true },
-  // Commodities
-  { symbol: 'OIL/WTI', price: '71.28', change: '-0.54%', up: false },
-  { symbol: 'NAT GAS', price: '2.84', change: '+1.42%', up: true },
-  // Global Indices
-  { symbol: 'NIKKEI 225', price: '38,456.20', change: '+0.34%', up: true },
-  { symbol: 'DAX 40', price: '21,842.50', change: '+0.28%', up: true },
-  { symbol: 'CHINA A50', price: '12,845.60', change: '-0.18%', up: false },
 ];
 
 // Crypto symbols for CoinGecko
@@ -81,7 +70,7 @@ const stockMap: Record<string, string> = {
 };
 
 // Fetch crypto data from CoinGecko
-const fetchCryptoData = async (symbol: string, display: string): Promise<MarketData | null> => {
+async function fetchCryptoData(symbol: string, display: string): Promise<MarketData | null> {
   try {
     const coinId = cryptoMap[symbol];
     if (!coinId) return null;
@@ -115,10 +104,10 @@ const fetchCryptoData = async (symbol: string, display: string): Promise<MarketD
     console.warn(`CoinGecko API error for ${symbol}:`, error);
     return null;
   }
-};
+}
 
 // Fetch stock/forex data from Yahoo Finance
-const fetchYahooData = async (symbol: string, display: string): Promise<MarketData | null> => {
+async function fetchYahooData(symbol: string, display: string): Promise<MarketData | null> {
   try {
     const ticker = stockMap[symbol];
     if (!ticker) return null;
@@ -154,10 +143,10 @@ const fetchYahooData = async (symbol: string, display: string): Promise<MarketDa
     console.warn(`Yahoo Finance API error for ${symbol}:`, error);
     return null;
   }
-};
+}
 
 // Main function to fetch all market data
-export const fetchAllMarketData = async (): Promise<MarketData[]> => {
+export async function fetchAllMarketData(): Promise<MarketData[]> {
   const allData: MarketData[] = [];
   const errors: string[] = [];
 
@@ -200,14 +189,14 @@ export const fetchAllMarketData = async (): Promise<MarketData[]> => {
   // Fallback to static data if all APIs fail
   console.log('Using fallback market data');
   return fallbackMarketData;
-};
+}
 
 // Helper function to get market data with caching
 let cachedData: MarketData[] | null = null;
 let lastFetch = 0;
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
-export const getCachedMarketData = async (): Promise<MarketData[]> => {
+export async function getCachedMarketData(): Promise<MarketData[]> {
   const now = Date.now();
   
   // Return cached data if still valid
@@ -226,4 +215,4 @@ export const getCachedMarketData = async (): Promise<MarketData[]> => {
     // Return cached data even if expired, or fallback
     return cachedData || fallbackMarketData;
   }
-};
+}

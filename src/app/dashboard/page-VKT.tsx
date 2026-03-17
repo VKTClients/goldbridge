@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import {
   LayoutDashboard, Wallet, ArrowUpRight, ArrowDownRight, Clock,
@@ -15,29 +16,69 @@ import KYCModal from "@/components/KYCModal";
 import WithdrawModal from "@/components/WithdrawModal";
 import DepositModal from "@/components/DepositModal";
 
-// Production data - will be populated from database
-const getStoredInvestments = () => {
-  if (typeof window === "undefined") return [];
-  try { return JSON.parse(localStorage.getItem("gb_investments") || "[]"); } catch { return []; }
-};
+// Realistic mock investments
+const mockInvestments = [
+  { 
+    id: 1, 
+    plan: "Starter", 
+    amountZAR: 3500, 
+    rate: 17.5, 
+    date: "2026-01-10", 
+    status: "Active",
+    currency: "ZAR",
+    paymentMethod: "Card"
+  },
+  { 
+    id: 2, 
+    plan: "Growth", 
+    amountZAR: 7500, 
+    rate: 30, 
+    date: "2026-01-22", 
+    status: "Active",
+    currency: "ZAR",
+    paymentMethod: "Luno"
+  },
+  { 
+    id: 3, 
+    plan: "Premium", 
+    amountZAR: 15000, 
+    rate: 45, 
+    date: "2026-02-05", 
+    status: "Active",
+    currency: "ZAR",
+    paymentMethod: "Card"
+  },
+];
 
-const getStoredTransactions = () => {
-  if (typeof window === "undefined") return [];
-  try { return JSON.parse(localStorage.getItem("gb_transactions") || "[]"); } catch { return []; }
-};
+const mockTransactions = [
+  { id: 1, type: "deposit", amount: 15000, date: "2026-02-05", description: "Premium Plan Deposit" },
+  { id: 2, type: "return", amount: 6750, date: "2026-02-10", description: "Weekly Return — Premium" },
+  { id: 3, type: "return", amount: 2250, date: "2026-02-10", description: "Weekly Return — Growth" },
+  { id: 4, type: "deposit", amount: 7500, date: "2026-01-22", description: "Growth Plan Deposit" },
+  { id: 5, type: "return", amount: 2250, date: "2026-02-03", description: "Weekly Return — Growth" },
+  { id: 6, type: "return", amount: 612.50, date: "2026-02-03", description: "Weekly Return — Starter" },
+  { id: 7, type: "deposit", amount: 3500, date: "2026-01-10", description: "Starter Plan Deposit" },
+  { id: 8, type: "return", amount: 612.50, date: "2026-01-27", description: "Weekly Return — Starter" },
+  { id: 9, type: "return", amount: 612.50, date: "2026-01-20", description: "Weekly Return — Starter" },
+  { id: 10, type: "withdrawal", amount: 5000, date: "2026-01-15", description: "Withdrawal to Bank" },
+];
 
-const getStoredNotifications = () => {
-  if (typeof window === "undefined") return [];
-  try { return JSON.parse(localStorage.getItem("gb_notifications") || "[]"); } catch { return []; }
-};
+const mockNotifications = [
+  { id: 1, type: "payout", title: "Weekly payout processed", desc: "R9,612.50 credited to your account", time: "2h ago", read: false },
+  { id: 2, type: "security", title: "New login detected", desc: "Chrome on Windows • Johannesburg, SA", time: "5h ago", read: false },
+  { id: 3, type: "system", title: "Investment successful", desc: "Premium Plan R15,000 activated", time: "1d ago", read: true },
+  { id: 4, type: "payout", title: "Weekly payout processed", desc: "R2,862.50 credited to your account", time: "1w ago", read: true },
+  { id: 5, type: "system", title: "Welcome to GoldBridge", desc: "Your account is ready. Start investing today!", time: "2w ago", read: true },
+];
 
-const getStoredGoals = () => {
-  if (typeof window === "undefined") return [];
-  try { return JSON.parse(localStorage.getItem("gb_goals") || "[]"); } catch { return []; }
-};
+const mockGoals = [
+  { id: 1, name: "Emergency Fund", target: 100000, current: 72500, icon: Shield },
+  { id: 2, name: "Property Deposit", target: 500000, current: 180000, icon: Target },
+  { id: 3, name: "Retirement Fund", target: 2000000, current: 350000, icon: TrendingUp },
+];
 
 // Generate personal daily portfolio growth based on client investments
-function generateDailyGrowth(investments: any[]) {
+function generateDailyGrowth(investments: typeof mockInvestments) {
   const totalInvested = investments.reduce((s, i) => s + i.amountZAR, 0);
   const dailyReturn = investments.reduce((s, i) => s + (i.amountZAR * i.rate / 100) / 7, 0);
   const days = 14; // Show last 14 days
@@ -129,7 +170,8 @@ function PortfolioChart({ data }: { data: { week: string; value: number }[] }) {
 }
 
 export default function DashboardPage() {
-  const { user, isLoading, logout } = useAuth();
+  const router = useRouter();
+  const { user, isLoading, logout, isAdmin } = useAuth();
   const [activeTab, setActiveTab] = useState<TabKey>("overview");
   const [showNotifications, setShowNotifications] = useState(false);
   const [copiedRef, setCopiedRef] = useState(false);
@@ -138,17 +180,30 @@ export default function DashboardPage() {
   const [showKYCModal, setShowKYCModal] = useState(false);
   const [showWithdrawModal, setShowWithdrawModal] = useState(false);
   const [showDepositModal, setShowDepositModal] = useState(false);
-  const investments = getStoredInvestments();
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  const investments = mockInvestments;
 
   const referralCode = user ? `GB-${user.name.replace(/\s/g, "").toUpperCase().slice(0, 4)}-${Math.random().toString(36).slice(2, 6).toUpperCase()}` : "";
   const referralLink = `https://goldbridge.capital/ref/${referralCode}`;
 
   useEffect(() => {
     if (!isLoading && !user) {
-      window.location.href = "/";
+      router.replace("/");
     }
-  }, [user, isLoading]);
+  }, [user, isLoading, router]);
 
+  // Prevent accidental back-button navigation away from dashboard
+  useEffect(() => {
+    if (!user) return;
+    const handlePopState = () => {
+      // Push state back so user stays on dashboard
+      window.history.pushState(null, "", window.location.href);
+      setShowLogoutConfirm(true);
+    };
+    window.history.pushState(null, "", window.location.href);
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
+  }, [user]);
 
   if (isLoading || !user) {
     return (
@@ -163,15 +218,12 @@ export default function DashboardPage() {
   const totalReturns = weeklyReturn * 6;
   const currentValue = totalInvested + totalReturns;
   const chartData = generateDailyGrowth(investments);
-  const notifications = getStoredNotifications();
-  const transactions = getStoredTransactions();
-  const goals = getStoredGoals();
-  const unreadCount = notifications.filter(n => !n.read).length;
-  const filteredTx = txFilter === "all" ? transactions : transactions.filter(t => t.type === txFilter);
+  const unreadCount = mockNotifications.filter(n => !n.read).length;
+  const filteredTx = txFilter === "all" ? mockTransactions : mockTransactions.filter(t => t.type === txFilter);
 
   const handleLogout = () => {
     logout();
-    window.location.href = "/";
+    router.replace("/");
   };
 
   const copyReferral = () => {
@@ -194,6 +246,55 @@ export default function DashboardPage() {
         isOpen={showDepositModal}
         onClose={() => setShowDepositModal(false)}
       />
+
+      {/* Logout Confirmation Modal */}
+      <AnimatePresence>
+        {showLogoutConfirm && (
+          <motion.div
+            className="fixed inset-0 z-[100] flex items-center justify-center p-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <motion.div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => setShowLogoutConfirm(false)} />
+            <motion.div
+              className="relative w-full max-w-[360px] bg-[#0a0a0e] border border-white/[0.06] rounded-2xl shadow-2xl p-6 text-center"
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+            >
+              <div className="w-12 h-12 rounded-full bg-amber-500/10 border border-amber-500/20 flex items-center justify-center mx-auto mb-4">
+                <LogOut size={20} className="text-amber-400" />
+              </div>
+              <h3 className="text-white text-base font-display font-semibold mb-2">Leave Dashboard?</h3>
+              <p className="text-[#555] text-xs mb-5 leading-relaxed">
+                Would you like to sign out or go back to the homepage?
+              </p>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowLogoutConfirm(false)}
+                  className="flex-1 py-2.5 text-sm font-medium text-[#888] border border-white/[0.06] rounded-xl hover:bg-white/[0.03] transition-colors"
+                >
+                  Stay
+                </button>
+                <button
+                  onClick={() => { setShowLogoutConfirm(false); router.push("/"); }}
+                  className="flex-1 py-2.5 text-sm font-medium text-white bg-white/[0.06] border border-white/[0.06] rounded-xl hover:bg-white/[0.1] transition-colors"
+                >
+                  Home
+                </button>
+                <button
+                  onClick={() => { setShowLogoutConfirm(false); handleLogout(); }}
+                  className="flex-1 py-2.5 text-sm font-medium text-red-400 bg-red-500/[0.06] border border-red-500/[0.12] rounded-xl hover:bg-red-500/[0.1] transition-colors"
+                >
+                  Sign Out
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
     <div className="min-h-screen bg-[#060608] flex">
       {/* Sidebar — Desktop */}
       <aside className="hidden md:flex flex-col w-[240px] bg-[#09090c] border-r border-white/[0.04] fixed top-0 left-0 h-screen z-40">
@@ -222,6 +323,15 @@ export default function DashboardPage() {
               {item.label}
             </button>
           ))}
+          {isAdmin && (
+            <a
+              href="/admin"
+              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-medium transition-all duration-200 text-[#D4AF37]/70 hover:text-[#D4AF37] hover:bg-[#D4AF37]/[0.04] border border-transparent mt-3"
+            >
+              <Shield size={15} />
+              Admin Panel
+            </a>
+          )}
         </nav>
 
         {/* Referral CTA in sidebar */}
@@ -294,6 +404,15 @@ export default function DashboardPage() {
               {item.label}
             </button>
           ))}
+          {isAdmin && (
+            <a
+              href="/admin"
+              className="flex-1 flex flex-col items-center gap-1 py-2.5 text-[9px] font-medium text-[#D4AF37]/60"
+            >
+              <Shield size={14} />
+              Admin
+            </a>
+          )}
         </div>
       </div>
 
@@ -321,12 +440,7 @@ export default function DashboardPage() {
                 </button>
               </div>
               <div className="flex-1 overflow-y-auto">
-                {notifications.length === 0 ? (
-                  <div className="text-center py-8">
-                    <Bell className="w-8 h-8 text-[#555] mx-auto mb-3" />
-                    <p className="text-[#555] text-sm">No notifications yet</p>
-                  </div>
-                ) : notifications.map((n) => (
+                {mockNotifications.map((n) => (
                   <div key={n.id} className={`flex gap-3 px-4 py-3 border-b border-white/[0.03] hover:bg-white/[0.02] transition-colors ${!n.read ? "bg-[#D4AF37]/[0.02]" : ""}`}>
                     <div className={`w-8 h-8 rounded-lg flex-shrink-0 flex items-center justify-center ${
                       n.type === "payout" ? "bg-emerald-500/10" :
@@ -613,11 +727,7 @@ export default function DashboardPage() {
                     </button>
                   </div>
                   <div className="space-y-2">
-                    {transactions.length === 0 ? (
-                      <div className="text-center py-6">
-                        <p className="text-[#555] text-sm">No transactions yet</p>
-                      </div>
-                    ) : transactions.slice(0, 5).map((tx) => (
+                    {mockTransactions.slice(0, 5).map((tx) => (
                       <div key={tx.id} className="flex items-center gap-3 p-2.5 rounded-lg hover:bg-white/[0.02] transition-colors">
                         <div className={`w-7 h-7 rounded-lg flex items-center justify-center ${
                           tx.type === "deposit" ? "bg-blue-500/10" :
@@ -654,12 +764,7 @@ export default function DashboardPage() {
                   </a>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                  {goals.length === 0 ? (
-                    <div className="text-center py-6">
-                      <Target className="w-8 h-8 text-[#555] mx-auto mb-3" />
-                      <p className="text-[#555] text-sm">No goals set yet</p>
-                    </div>
-                  ) : goals.map((goal) => {
+                  {mockGoals.map((goal) => {
                     const pct = Math.min((goal.current / goal.target) * 100, 100);
                     return (
                       <div key={goal.id} className="p-3 rounded-lg bg-white/[0.02] border border-white/[0.03]">
@@ -726,7 +831,7 @@ export default function DashboardPage() {
                     </div>
                     <div className="flex items-center gap-2">
                       <TrendingUp size={13} className="text-[#D4AF37]" />
-                      <span className="text-[#555] text-xs">Active plans: <span className="text-white">{investments.length}</span></span>
+                      <span className="text-[#555] text-xs">Active plans: <span className="text-white">{mockInvestments.length}</span></span>
                     </div>
                     <div className="flex items-center gap-2">
                       <Shield size={13} className="text-amber-400" />

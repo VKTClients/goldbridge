@@ -11,17 +11,21 @@ interface WithdrawModalProps {
   availableBalance: number;
 }
 
-const walletTypes = [
-  { id: "btc", name: "Bitcoin", symbol: "BTC", color: "text-orange-400", bgColor: "bg-orange-500/10", borderColor: "border-orange-500/20", icon: "₿", placeholder: "bc1q... or 1A1zP1..." },
-  { id: "eth", name: "Ethereum", symbol: "ETH", color: "text-blue-400", bgColor: "bg-blue-500/10", borderColor: "border-blue-500/20", icon: "Ξ", placeholder: "0x742d35Cc..." },
-  { id: "usdt", name: "USDT (TRC20)", symbol: "USDT", color: "text-emerald-400", bgColor: "bg-emerald-500/10", borderColor: "border-emerald-500/20", icon: "₮", placeholder: "TQn9Y2khEs..." },
-];
+const WITHDRAW_WALLET_TYPE = {
+  id: "usdt",
+  name: "USDT (ERC-20)",
+  symbol: "USDT",
+  color: "text-emerald-400",
+  bgColor: "bg-emerald-500/10",
+  borderColor: "border-emerald-500/20",
+  icon: "₮",
+  placeholder: "0x742d35Cc6634C0532925a3b...",
+};
 
 export default function WithdrawModal({ isOpen, onClose, availableBalance }: WithdrawModalProps) {
   const { user } = useAuth();
   const [step, setStep] = useState<"amount" | "wallet" | "confirm" | "success">("amount");
   const [amount, setAmount] = useState("");
-  const [selectedWalletType, setSelectedWalletType] = useState(0);
   const [walletAddress, setWalletAddress] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
@@ -29,12 +33,11 @@ export default function WithdrawModal({ isOpen, onClose, availableBalance }: Wit
   const amountNum = parseFloat(amount) || 0;
   const minWithdraw = 500;
   const maxWithdraw = user?.kycStatus === "verified" ? availableBalance : Math.min(availableBalance, 10000);
-  const wallet = walletTypes[selectedWalletType];
+  const wallet = WITHDRAW_WALLET_TYPE;
 
   const reset = () => {
     setStep("amount");
     setAmount("");
-    setSelectedWalletType(0);
     setWalletAddress("");
     setError("");
   };
@@ -63,9 +66,17 @@ export default function WithdrawModal({ isOpen, onClose, availableBalance }: Wit
     }
   };
 
+  const isValidERC20Address = (address: string) => {
+    return /^0x[a-fA-F0-9]{40}$/.test(address);
+  };
+
   const handleSubmit = async () => {
-    if (!walletAddress || walletAddress.length < 10) {
-      setError("Please enter a valid wallet address");
+    if (!walletAddress) {
+      setError("Please enter your wallet address");
+      return;
+    }
+    if (!isValidERC20Address(walletAddress)) {
+      setError("Invalid ERC-20 address. Must start with 0x and be 42 characters.");
       return;
     }
     
@@ -213,33 +224,21 @@ export default function WithdrawModal({ isOpen, onClose, availableBalance }: Wit
                     </div>
                   </div>
 
-                  {/* Wallet Type Selection */}
-                  <div className="mb-4">
-                    <label className="text-[#555] text-[10px] uppercase tracking-[0.2em] mb-2 block">
-                      Select Cryptocurrency
-                    </label>
-                    <div className="grid grid-cols-3 gap-2">
-                      {walletTypes.map((w, i) => (
-                        <button
-                          key={w.id}
-                          onClick={() => setSelectedWalletType(i)}
-                          className={`flex flex-col items-center gap-1.5 p-3 rounded-xl border transition-all ${
-                            selectedWalletType === i
-                              ? `${w.bgColor} ${w.borderColor} ${w.color}`
-                              : "bg-white/[0.02] border-white/[0.06] text-[#666] hover:border-white/[0.1]"
-                          }`}
-                        >
-                          <span className="text-lg font-bold">{w.icon}</span>
-                          <span className="text-[10px] font-semibold">{w.symbol}</span>
-                        </button>
-                      ))}
+                  {/* ERC-20 Badge */}
+                  <div className="flex items-center gap-2 mb-4 p-3 bg-emerald-500/[0.04] border border-emerald-500/[0.12] rounded-xl">
+                    <div className="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
+                      <span className="text-emerald-400 text-sm font-bold">₮</span>
+                    </div>
+                    <div>
+                      <p className="text-white text-xs font-semibold">USDT — Tether</p>
+                      <p className="text-emerald-400 text-[10px] font-medium">Withdrawals via ERC-20 Network Only</p>
                     </div>
                   </div>
 
                   {/* Wallet Address Input */}
                   <div className="mb-5">
                     <label className="text-[#555] text-[10px] uppercase tracking-[0.15em] mb-1.5 block">
-                      {wallet.name} Wallet Address *
+                      Your USDT (ERC-20) Wallet Address *
                     </label>
                     <input
                       type="text"
@@ -249,7 +248,7 @@ export default function WithdrawModal({ isOpen, onClose, availableBalance }: Wit
                       className="w-full bg-white/[0.03] border border-white/[0.06] rounded-xl px-4 py-3 text-white text-sm font-mono outline-none focus:border-emerald-500/30 transition-colors"
                     />
                     <p className="text-[#444] text-[9px] mt-1.5">
-                      Make sure this is a valid <span className={wallet.color}>{wallet.symbol}</span> address. Sending to the wrong address may result in permanent loss.
+                      Enter a valid <span className="text-emerald-400">ERC-20</span> wallet address. Funds will be sent as <span className="text-white">USDT</span> on the Ethereum network. Using an incorrect address may result in <span className="text-red-400">permanent loss</span>.
                     </p>
                   </div>
 
@@ -266,8 +265,12 @@ export default function WithdrawModal({ isOpen, onClose, availableBalance }: Wit
                     </button>
                     <button
                       onClick={() => {
-                        if (!walletAddress || walletAddress.length < 10) {
-                          setError("Please enter a valid wallet address");
+                        if (!walletAddress) {
+                          setError("Please enter your wallet address");
+                          return;
+                        }
+                        if (!isValidERC20Address(walletAddress)) {
+                          setError("Invalid ERC-20 address. Must start with 0x and be 42 characters.");
                           return;
                         }
                         setError("");

@@ -62,7 +62,7 @@ const keywordResponses: KeywordResponse[] = [
   },
   {
     keywords: ["safe", "secure", "trust", "legit", "scam", "real", "protection"],
-    response: "Your security is our top priority! 🛡️\n\n✅ **Bank-grade encryption** (256-bit SSL)\n✅ **Regulated & compliant** (KYC/AML)\n✅ **Cold storage** for digital assets\n✅ **24/7 monitoring** & fraud detection\n✅ **25+ years** in business since 2000\n\nOver 12,000 investors trust us with $1.8B+ in assets.",
+    response: "Your security is our top priority! 🛡️\n\n✅ **Bank-grade encryption** (256-bit SSL)\n✅ **Regulated & compliant** (KYC/AML)\n✅ **Cold storage** for digital assets\n✅ **24/7 monitoring** & fraud detection\n✅ **25+ years** in business since 2000\n\nOver 12,000 investors trust us with $10M+ in assets.",
     followUp: ["How long in business?", "Where are you based?"]
   },
   {

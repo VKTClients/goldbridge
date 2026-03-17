@@ -62,17 +62,37 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const existing = users[email];
     if (existing && existing.password !== password) return false;
 
+    // Register new users automatically on first login
+    if (!existing) {
+      users[email] = { name: email.split("@")[0], password };
+      localStorage.setItem("gb_users", JSON.stringify(users));
+    }
+
     const role = ADMIN_EMAILS.includes(email.toLowerCase()) ? "admin" : "user";
+
+    // Restore previous session data (KYC status etc.) if exists
+    let previousKycStatus: User["kycStatus"] = "pending";
+    let previousKycDocs: User["kycDocuments"] | undefined;
+    try {
+      const prevSession = localStorage.getItem(`gb_user_profile_${email}`);
+      if (prevSession) {
+        const prev = JSON.parse(prevSession);
+        previousKycStatus = prev.kycStatus || "pending";
+        previousKycDocs = prev.kycDocuments;
+      }
+    } catch {}
 
     const userData: User = {
       email,
       name: existing?.name || email.split("@")[0],
       joined: new Date().toISOString(),
       role,
-      kycStatus: "pending",
+      kycStatus: previousKycStatus,
+      kycDocuments: previousKycDocs,
     };
 
     localStorage.setItem("gb_user", JSON.stringify(userData));
+    localStorage.setItem(`gb_user_profile_${email}`, JSON.stringify(userData));
     setUser(userData);
     setShowAuthModal(false);
     return true;
@@ -110,6 +130,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!user) return;
     const updatedUser = { ...user, kycStatus: status, kycDocuments: documents || user.kycDocuments };
     localStorage.setItem("gb_user", JSON.stringify(updatedUser));
+    localStorage.setItem(`gb_user_profile_${user.email}`, JSON.stringify(updatedUser));
     setUser(updatedUser);
   };
 

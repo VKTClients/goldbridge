@@ -12,6 +12,7 @@ const navLinks = [
   { label: "Why Trust Us", href: "/trust" },
   { label: "Referrals", href: "/referrals" },
   { label: "Packages", href: "/#pricing" },
+  { label: "FAQs", href: "/#faq" },
   { label: "Privacy", href: "/privacy" },
   { label: "Terms", href: "/terms" },
 ];
