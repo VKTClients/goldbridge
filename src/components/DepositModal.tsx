@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { X, Copy, Check, Wallet, AlertCircle, ArrowRight, Clock } from "lucide-react";
+import { X, Copy, Check, Wallet, AlertCircle, ArrowRight, Clock, ExternalLink } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/context/AuthContext";
 
@@ -10,12 +10,14 @@ interface DepositModalProps {
   onClose: () => void;
 }
 
+const LUNO_DEPOSIT_ADDRESS = "0x2E6e0c9712a2bEa561A561D579E27ADa74C26887";
+
 const DEPOSIT_WALLET = {
   id: "usdt",
   name: "USDT (ERC-20)",
   symbol: "USDT",
-  address: process.env.NEXT_PUBLIC_DEPOSIT_WALLET_ADDRESS || "0x742d35Cc6634C0532925a3b844Bc9e7595f2bD18",
-  network: process.env.NEXT_PUBLIC_WALLET_NETWORK || "ERC-20 Network",
+  address: LUNO_DEPOSIT_ADDRESS,
+  network: "ERC-20 Network",
   color: "text-emerald-400",
   bgColor: "bg-emerald-500/10",
   borderColor: "border-emerald-500/20",
@@ -199,6 +201,22 @@ export default function DepositModal({ isOpen, onClose }: DepositModalProps) {
                         {copiedAddress ? <Check size={14} /> : <Copy size={14} />}
                       </button>
                     </div>
+
+                    {/* Luno Deposit Button */}
+                    <a
+                      href={`https://www.luno.com/wallet/send?to=${LUNO_DEPOSIT_ADDRESS}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={() => {
+                        navigator.clipboard.writeText(LUNO_DEPOSIT_ADDRESS);
+                        setCopiedAddress(true);
+                        setTimeout(() => setCopiedAddress(false), 2000);
+                      }}
+                      className="flex items-center justify-center gap-2 w-full mt-3 py-2.5 px-4 bg-[#0055FF]/10 border border-[#0055FF]/30 rounded-xl text-[#4A90FF] text-xs font-medium hover:bg-[#0055FF]/20 transition-colors"
+                    >
+                      <ExternalLink size={14} />
+                      Deposit via Luno (Address copied)
+                    </a>
                     <p className="text-[#444] text-[9px] mt-1.5">
                       Only send <span className={wallet.color}>{wallet.symbol}</span> on the <span className="text-white">{wallet.network}</span>. Sending other assets may result in permanent loss.
                     </p>
