@@ -9,38 +9,131 @@ import {
   BarChart3, CreditCard, Settings, Bell, Home, Shield, Copy,
   Check, Users, Download, HelpCircle, AlertTriangle, Target,
   Gift, MessageCircle, FileText, X, ArrowRight, Zap,
-  ShieldCheck, Smartphone, Lock, CheckCircle2
+  ShieldCheck, Smartphone, Lock, CheckCircle2, Briefcase,
+  GraduationCap, type LucideIcon
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import KYCModal from "@/components/KYCModal";
 import WithdrawModal from "@/components/WithdrawModal";
 import DepositModal from "@/components/DepositModal";
 
-// Production data - will be populated from database
-const getStoredInvestments = () => {
-  if (typeof window === "undefined") return [];
-  try { return JSON.parse(localStorage.getItem("gb_investments") || "[]"); } catch { return []; }
+interface StoredInvestment {
+  id: string;
+  package?: string;
+  plan?: string;
+  amountZAR: number;
+  date: string;
+  status: string;
+  rate?: number;
+}
+
+interface DashboardInvestment {
+  id: string;
+  plan: string;
+  amountZAR: number;
+  date: string;
+  status: string;
+  rate: number;
+}
+
+type TransactionType = "deposit" | "return" | "withdrawal";
+
+interface DashboardTransaction {
+  id: string;
+  type: TransactionType;
+  amount: number;
+  date: string;
+  description: string;
+}
+
+type NotificationType = "payout" | "security" | "referral" | "system";
+
+interface DashboardNotification {
+  id: string;
+  type: NotificationType;
+  title: string;
+  desc: string;
+  time: string;
+  read: boolean;
+}
+
+interface StoredGoal {
+  id: string;
+  name: string;
+  target: number;
+  current: number;
+  iconKey?: string;
+}
+
+interface DashboardGoal extends StoredGoal {
+  icon: LucideIcon;
+}
+
+const PLAN_RATES: Record<string, number> = {
+  Starter: 17.5,
+  Growth: 30,
+  Premium: 45,
 };
 
-const getStoredTransactions = () => {
-  if (typeof window === "undefined") return [];
-  try { return JSON.parse(localStorage.getItem("gb_transactions") || "[]"); } catch { return []; }
+const GOAL_ICONS: Record<string, LucideIcon> = {
+  shield: Shield,
+  home: Home,
+  trending: TrendingUp,
+  briefcase: Briefcase,
+  grad: GraduationCap,
+  target: Target,
 };
 
-const getStoredNotifications = () => {
+function readStoredItems<T>(key: string): T[] {
   if (typeof window === "undefined") return [];
-  try { return JSON.parse(localStorage.getItem("gb_notifications") || "[]"); } catch { return []; }
-};
+  try {
+    const stored = JSON.parse(localStorage.getItem(key) || "[]") as unknown;
+    return Array.isArray(stored) ? (stored as T[]) : [];
+  } catch {
+    return [];
+  }
+}
 
-const getStoredGoals = () => {
-  if (typeof window === "undefined") return [];
-  try { return JSON.parse(localStorage.getItem("gb_goals") || "[]"); } catch { return []; }
-};
+function getPlanRate(plan: string) {
+  return PLAN_RATES[plan] ?? 0;
+}
+
+function normalizeInvestment(investment: StoredInvestment): DashboardInvestment {
+  const plan = investment.plan ?? investment.package ?? "Starter";
+
+  return {
+    id: investment.id,
+    plan,
+    amountZAR: Number(investment.amountZAR) || 0,
+    date: investment.date,
+    status: investment.status,
+    rate: typeof investment.rate === "number" ? investment.rate : getPlanRate(plan),
+  };
+}
+
+function getStoredInvestments(): DashboardInvestment[] {
+  return readStoredItems<StoredInvestment>("gb_investments").map(normalizeInvestment);
+}
+
+function getStoredTransactions(): DashboardTransaction[] {
+  return readStoredItems<DashboardTransaction>("gb_transactions");
+}
+
+function getStoredNotifications(): DashboardNotification[] {
+  return readStoredItems<DashboardNotification>("gb_notifications");
+}
+
+function getStoredGoals(): DashboardGoal[] {
+  return readStoredItems<StoredGoal>("gb_goals").map((goal) => ({
+    ...goal,
+    icon: GOAL_ICONS[goal.iconKey ?? "target"] ?? Target,
+  }));
+}
 
 // Generate personal daily portfolio growth based on client investments
-function generateDailyGrowth(investments: any[]) {
-  const totalInvested = investments.reduce((s, i) => s + i.amountZAR, 0);
-  const dailyReturn = investments.reduce((s, i) => s + (i.amountZAR * i.rate / 100) / 7, 0);
+function generateDailyGrowth(investments: DashboardInvestment[]) {
+  const totalInvested = investments.reduce((s: number, i) => s + i.amountZAR, 0);
+  const dailyReturn = investments.reduce((s: number, i) => s + (i.amountZAR * i.rate / 100) / 7, 0);
   const days = 14; // Show last 14 days
   const data: { week: string; value: number }[] = [];
   const today = new Date();
@@ -173,10 +266,11 @@ export default function DashboardPage() {
     );
   }
 
-  const totalInvested = investments.reduce((s, i) => s + i.amountZAR, 0);
-  const weeklyReturn = investments.reduce((s, i) => s + (i.amountZAR * i.rate) / 100, 0);
+  const totalInvested = investments.reduce((s: number, i) => s + i.amountZAR, 0);
+  const weeklyReturn = investments.reduce((s: number, i) => s + (i.amountZAR * i.rate) / 100, 0);
   const totalReturns = weeklyReturn * 6;
   const currentValue = totalInvested + totalReturns;
+  const totalReturnPct = totalInvested > 0 ? (totalReturns / totalInvested) * 100 : 0;
   const chartData = generateDailyGrowth(investments);
   const notifications = getStoredNotifications();
   const transactions = getStoredTransactions();
@@ -597,7 +691,7 @@ export default function DashboardPage() {
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mb-4">
                 {[
                   { label: "Total Invested", value: formatCurrency(totalInvested), icon: Wallet, change: null },
-                  { label: "Current Value", value: formatCurrency(currentValue), icon: TrendingUp, change: `+${((totalReturns / totalInvested) * 100).toFixed(1)}%` },
+                  { label: "Current Value", value: formatCurrency(currentValue), icon: TrendingUp, change: `+${totalReturnPct.toFixed(1)}%` },
                   { label: "Weekly Return", value: formatCurrency(weeklyReturn), icon: DollarSign, change: null },
                   { label: "Total Returns", value: formatCurrency(totalReturns), icon: ArrowUpRight, change: null },
                 ].map((stat) => (
@@ -625,7 +719,7 @@ export default function DashboardPage() {
                   {totalInvested > 0 && (
                     <div className="flex items-center gap-1.5 text-[10px] text-emerald-400">
                       <TrendingUp size={11} />
-                      <span>+{((totalReturns / totalInvested) * 100).toFixed(1)}% total</span>
+                      <span>+{totalReturnPct.toFixed(1)}% total</span>
                     </div>
                   )}
                 </div>
