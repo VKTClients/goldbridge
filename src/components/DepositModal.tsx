@@ -10,7 +10,7 @@ interface DepositModalProps {
   onClose: () => void;
 }
 
-const LUNO_DEPOSIT_ADDRESS = "0x2E6e0c9712a2bEa561A561D579E27ADa74C26887";
+const LUNO_DEPOSIT_ADDRESS = "0x0F49B970d2100C2c1799c8b9993ed3f3B7F6A49A";
 
 const DEPOSIT_WALLET = {
   id: "usdt",
