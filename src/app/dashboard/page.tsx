@@ -16,6 +16,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import KYCModal from "@/components/KYCModal";
 import WithdrawModal from "@/components/WithdrawModal";
 import DepositModal from "@/components/DepositModal";
+import HowToDepositGuide from "@/components/HowToDepositGuide";
 
 interface StoredInvestment {
   id: string;
@@ -233,6 +234,7 @@ export default function DashboardPage() {
   const [showKYCModal, setShowKYCModal] = useState(false);
   const [showWithdrawModal, setShowWithdrawModal] = useState(false);
   const [showDepositModal, setShowDepositModal] = useState(false);
+  const [showDepositGuide, setShowDepositGuide] = useState(false);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const investments = getStoredInvestments();
 
@@ -303,6 +305,22 @@ export default function DashboardPage() {
         isOpen={showDepositModal}
         onClose={() => setShowDepositModal(false)}
       />
+      <AnimatePresence>
+        {showDepositGuide && (
+          <HowToDepositGuide
+            onClose={() => setShowDepositGuide(false)}
+            onNeedHelp={() => setShowSupport(true)}
+            onProceedToInvestment={() => {
+              setShowDepositGuide(false);
+              router.push("/invest");
+            }}
+            onSubmitProof={() => {
+              setShowDepositGuide(false);
+              setShowDepositModal(true);
+            }}
+          />
+        )}
+      </AnimatePresence>
       {/* Logout Confirmation Modal */}
       <AnimatePresence>
         {showLogoutConfirm && (
@@ -665,6 +683,33 @@ export default function DashboardPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3 }}
             >
+              <div className="mb-4 md:mb-5 rounded-2xl border border-white/[0.05] bg-[linear-gradient(135deg,rgba(212,175,55,0.08)_0%,rgba(255,255,255,0.02)_100%)] p-4 md:p-5">
+                <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                  <div>
+                    <p className="text-[#D4AF37] text-[10px] uppercase tracking-[0.22em] mb-1.5">
+                      Luno funding guide
+                    </p>
+                    <h3 className="text-white text-base md:text-lg font-semibold mb-1">
+                      Need help sending USDT to Gold Bridge Capital?
+                    </h3>
+                    <p className="text-[#666] text-sm leading-relaxed max-w-2xl">
+                      Open the guided deposit flow for a clean step-by-step walkthrough before you use the dashboard actions below.
+                    </p>
+                  </div>
+
+                  <button
+                    onClick={() => {
+                      setShowNotifications(false);
+                      setShowDepositGuide(true);
+                    }}
+                    className="inline-flex items-center justify-center gap-2 rounded-full border border-[#D4AF37]/25 bg-[#D4AF37]/10 px-5 py-3 text-sm font-semibold text-[#F3D889] hover:border-[#D4AF37]/40 hover:text-white transition-colors"
+                  >
+                    <HelpCircle size={16} />
+                    How to Deposit
+                  </button>
+                </div>
+              </div>
+
               {/* Quick Actions */}
               <div className="grid grid-cols-3 gap-2 md:gap-3 mb-4">
                 <button 

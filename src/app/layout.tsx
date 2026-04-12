@@ -1,12 +1,73 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import Providers from "@/components/Providers";
+import {
+  absoluteUrl,
+  defaultDescription,
+  defaultKeywords,
+  getOrganizationSchema,
+  getWebsiteSchema,
+  googleSiteVerification,
+  siteName,
+  siteUrl,
+} from "@/lib/seo";
 
 export const metadata: Metadata = {
-  title: "Goldbridge Capital | Premium Asset Management",
-  description:
-    "Goldbridge Capital is a premier investment management firm offering sophisticated portfolio strategies and wealth management solutions for discerning investors.",
-  keywords: "investment, wealth management, portfolio, capital, finance, defi",
+  metadataBase: new URL(siteUrl),
+  applicationName: siteName,
+  title: {
+    default: `${siteName} | Premium Asset Management`,
+    template: `%s | ${siteName}`,
+  },
+  description: defaultDescription,
+  keywords: defaultKeywords,
+  referrer: "origin-when-cross-origin",
+  creator: siteName,
+  publisher: siteName,
+  category: "finance",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: siteName,
+  },
+  icons: {
+    icon: "/logo.png",
+    shortcut: "/logo.png",
+    apple: "/logo.png",
+  },
+  openGraph: {
+    title: `${siteName} | Premium Asset Management`,
+    description: defaultDescription,
+    url: siteUrl,
+    siteName,
+    locale: "en_US",
+    type: "website",
+    images: [
+      {
+        url: absoluteUrl("/logo.png"),
+        alt: siteName,
+      },
+    ],
+  },
+  twitter: {
+    card: "summary",
+    title: `${siteName} | Premium Asset Management`,
+    description: defaultDescription,
+    images: [absoluteUrl("/logo.png")],
+  },
+  verification: googleSiteVerification
+    ? {
+        google: googleSiteVerification,
+      }
+    : undefined,
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  viewportFit: "cover",
+  themeColor: "#060608",
 };
 
 export default function RootLayout({
@@ -14,15 +75,17 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const structuredData = [getOrganizationSchema(), getWebsiteSchema()];
+
   return (
     <html lang="en" className="scroll-smooth">
-      <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, viewport-fit=cover" />
-        <meta name="theme-color" content="#060608" />
-        <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-      </head>
       <body className="antialiased">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(structuredData),
+          }}
+        />
         <Providers>
           {children}
         </Providers>

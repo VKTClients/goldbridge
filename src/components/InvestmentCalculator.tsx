@@ -1,11 +1,19 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import { Calculator, TrendingUp, ArrowUpRight, ChevronDown } from "lucide-react";
 import AnimateOnScroll from "./AnimateOnScroll";
 import CounterNumber from "./CounterNumber";
 import { useAuth } from "@/context/AuthContext";
+import {
+  CurrencyCode,
+  getCurrencyByCode,
+  roundCurrencyAmount,
+  supportedCurrencies,
+  supportedCurrencyCodes,
+} from "@/lib/currency";
+import { usePreferredCurrency } from "@/hooks/usePreferredCurrency";
 
 const tiers = [
   { name: "Starter", min: 1000, max: 4999, rate: 0.175, label: "15–20% /week" },
@@ -13,24 +21,19 @@ const tiers = [
   { name: "Premium", min: 10000, max: 1000000, rate: 0.45, label: "40–50% /week" },
 ];
 
-const currencies = [
-  { code: "ZAR", symbol: "R", toZAR: 1, name: "South African Rand" },
-  { code: "USD", symbol: "$", toZAR: 18.52, name: "US Dollar" },
-  { code: "EUR", symbol: "€", toZAR: 20.0, name: "Euro" },
-  { code: "GBP", symbol: "£", toZAR: 23.26, name: "British Pound" },
-  { code: "NGN", symbol: "₦", toZAR: 0.012, name: "Nigerian Naira" },
-  { code: "KES", symbol: "KSh", toZAR: 0.143, name: "Kenyan Shilling" },
-  { code: "BWP", symbol: "P", toZAR: 1.35, name: "Botswana Pula" },
-];
+const calculatorCurrencyCodes = supportedCurrencyCodes;
+const initialInvestmentZAR = 10000;
 
 export default function InvestmentCalculator() {
   const { user, setShowAuthModal } = useAuth();
-  const [amountInCurrency, setAmountInCurrency] = useState(540); // ~R10,000 in USD
+  const [amountInCurrency, setAmountInCurrency] = useState(0);
+  const [hasInitializedAmount, setHasInitializedAmount] = useState(false);
   const [selectedTier, setSelectedTier] = useState(1);
-  const [selectedCurrency, setSelectedCurrency] = useState(1); // Default to USD
+  const { currencyCode, setCurrencyCode, source: currencySource, isReady } =
+    usePreferredCurrency(calculatorCurrencyCodes, "ZAR");
 
   const tier = tiers[selectedTier];
-  const currency = currencies[selectedCurrency];
+  const currency = getCurrencyByCode(currencyCode);
 
   const handleStartInvesting = () => {
     if (user) {
@@ -38,6 +41,24 @@ export default function InvestmentCalculator() {
     } else {
       setShowAuthModal(true);
     }
+  };
+
+  useEffect(() => {
+    if (!isReady || hasInitializedAmount) {
+      return;
+    }
+
+    setAmountInCurrency(roundCurrencyAmount(initialInvestmentZAR / currency.toZAR));
+    setHasInitializedAmount(true);
+  }, [currency.toZAR, hasInitializedAmount, isReady]);
+
+  const handleCurrencyChange = (nextCurrencyCode: CurrencyCode) => {
+    const nextCurrency = getCurrencyByCode(nextCurrencyCode);
+    const currentAmountZAR = amountInCurrency * currency.toZAR;
+    const convertedAmount = currentAmountZAR / nextCurrency.toZAR;
+
+    setAmountInCurrency(roundCurrencyAmount(convertedAmount));
+    setCurrencyCode(nextCurrencyCode);
   };
 
   // Convert input amount to ZAR for calculations
@@ -136,7 +157,7 @@ export default function InvestmentCalculator() {
                         // Convert current amount to new tier's currency range
                         const currentAmountZAR = amountInCurrency * currency.toZAR;
                         const clampedZAR = Math.max(t.min, Math.min(t.max, currentAmountZAR));
-                        setAmountInCurrency(clampedZAR / currency.toZAR);
+                        setAmountInCurrency(roundCurrencyAmount(clampedZAR / currency.toZAR));
                       }}
                       className={`py-3 px-2 rounded-xl text-center transition-all duration-300 border ${
                         selectedTier === i
@@ -158,25 +179,25 @@ export default function InvestmentCalculator() {
                 </label>
                 <div className="relative">
                   <select
-                    value={selectedCurrency}
-                    onChange={(e) => {
-                      const newCurrencyIndex = Number(e.target.value);
-                      const newCurrency = currencies[newCurrencyIndex];
-                      // Convert current amount to new currency
-                      const amountZAR = amountInCurrency * currency.toZAR;
-                      const newAmount = amountZAR / newCurrency.toZAR;
-                      setAmountInCurrency(Math.round(newAmount * 100) / 100);
-                      setSelectedCurrency(newCurrencyIndex);
-                    }}
+                    value={currency.code}
+                    onChange={(e) => handleCurrencyChange(e.target.value as CurrencyCode)}
                     className="w-full bg-white/[0.03] border border-white/[0.06] rounded-xl px-4 py-3 text-white text-sm outline-none focus:border-[#D4AF37]/30 transition-colors appearance-none cursor-pointer"
                   >
-                    {currencies.map((c, i) => (
-                      <option key={c.code} value={i} className="bg-[#0a0a0e] text-white">
+                    {supportedCurrencies.map((c) => (
+                      <option key={c.code} value={c.code} className="bg-[#0a0a0e] text-white">
                         {c.code} ({c.symbol}) - {c.name}
                       </option>
                     ))}
                   </select>
                   <ChevronDown size={16} className="absolute right-4 top-1/2 -translate-y-1/2 text-[#555] pointer-events-none" />
+                </div>
+                <div className="flex items-center justify-between gap-3 mt-2">
+                  <p className="text-[#444] text-[10px] leading-relaxed">
+                    We default to the browser region, but the currency can be changed anytime.
+                  </p>
+                  <span className="text-[#D4AF37] text-[10px] uppercase tracking-[0.18em] whitespace-nowrap">
+                    {currencySource === "saved" ? "Saved" : "Auto"}
+                  </span>
                 </div>
               </div>
 

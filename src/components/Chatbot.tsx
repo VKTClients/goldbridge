@@ -247,6 +247,23 @@ export default function Chatbot() {
     }
   }, [isOpen]);
 
+  useEffect(() => {
+    const handleExternalOpen = (event: Event) => {
+      const detail = (event as CustomEvent<{ prompt?: string }>).detail;
+      setIsOpen(true);
+
+      if (detail?.prompt) {
+        setInput(detail.prompt);
+      }
+    };
+
+    window.addEventListener("goldbridge-chat:open", handleExternalOpen as EventListener);
+
+    return () => {
+      window.removeEventListener("goldbridge-chat:open", handleExternalOpen as EventListener);
+    };
+  }, []);
+
   const sendMessage = (text: string) => {
     const trimmed = text.trim();
     if (!trimmed) return;

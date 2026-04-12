@@ -4,10 +4,25 @@ import { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import {
-  ArrowLeft, Check, ArrowUpRight, Copy, Wallet,
+  ArrowLeft, Check, ArrowUpRight, Copy,
   TrendingUp, Shield, AlertTriangle, ChevronDown, Info
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import {
+  CurrencyCode,
+  formatCurrencyAmount,
+  getCurrencyByCode,
+  roundCurrencyAmount,
+  supportedCurrencies,
+  supportedCurrencyCodes,
+} from "@/lib/currency";
+import {
+  DEPOSIT_WALLET_ADDRESS,
+  DEPOSIT_WALLET_NAME,
+  DEPOSIT_WALLET_NETWORK,
+  DEPOSIT_WALLET_SYMBOL,
+} from "@/lib/depositWallet";
+import { usePreferredCurrency } from "@/hooks/usePreferredCurrency";
 
 const packages = [
   {
@@ -42,19 +57,15 @@ const packages = [
   },
 ];
 
-const currencies = [
-  { code: "ZAR", symbol: "R", name: "South African Rand", flag: "🇿🇦", rate: 1 },
-  { code: "USD", symbol: "$", name: "US Dollar", flag: "🇺🇸", rate: 0.054 },
-  { code: "EUR", symbol: "€", name: "Euro", flag: "🇪🇺", rate: 0.050 },
-  { code: "GBP", symbol: "£", name: "British Pound", flag: "🇬🇧", rate: 0.043 },
-];
+const investCurrencyCodes = supportedCurrencyCodes;
+const zarCurrency = getCurrencyByCode("ZAR");
 
 const DEPOSIT_WALLET = {
   id: "usdt",
-  name: "USDT (ERC-20)",
-  symbol: "USDT",
-  address: process.env.NEXT_PUBLIC_DEPOSIT_WALLET_ADDRESS || "0x742d35Cc6634C0532925a3b844Bc9e7595f2bD18",
-  network: process.env.NEXT_PUBLIC_WALLET_NETWORK || "ERC-20 Network",
+  name: DEPOSIT_WALLET_NAME,
+  symbol: DEPOSIT_WALLET_SYMBOL,
+  address: DEPOSIT_WALLET_ADDRESS,
+  network: DEPOSIT_WALLET_NETWORK,
   color: "text-emerald-400",
   bgColor: "bg-emerald-500/10",
   borderColor: "border-emerald-500/20",
@@ -83,20 +94,16 @@ function saveInvestment(inv: StoredInvestment) {
   localStorage.setItem("gb_investments", JSON.stringify(existing));
 }
 
-function formatCurrency(amount: number, symbol: string = "R") {
-  if (symbol === "") return symbol + amount.toFixed(8);
-  return symbol + amount.toLocaleString("en-ZA", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-}
-
 export default function InvestPage() {
   const router = useRouter();
   const { user, isLoading } = useAuth();
   const [amount, setAmount] = useState<string>("");
-  const [selectedCurrency, setSelectedCurrency] = useState(0);
   const [copiedAddress, setCopiedAddress] = useState(false);
   const [showCurrencyDropdown, setShowCurrencyDropdown] = useState(false);
   const [step, setStep] = useState<"select" | "confirm" | "success">("select");
   const [error, setError] = useState("");
+  const { currencyCode, setCurrencyCode, source: currencySource } =
+    usePreferredCurrency(investCurrencyCodes, "ZAR");
 
   useEffect(() => {
     if (!isLoading && !user) {
@@ -104,9 +111,9 @@ export default function InvestPage() {
     }
   }, [user, isLoading, router]);
 
-  const currency = currencies[selectedCurrency];
+  const currency = getCurrencyByCode(currencyCode);
   const amountNum = Number(amount) || 0;
-  const amountZAR = amountNum / currency.rate;
+  const amountZAR = amountNum * currency.toZAR;
 
   // Auto-select package based on ZAR amount
   const autoPackage = useMemo(() => {
@@ -132,6 +139,17 @@ export default function InvestPage() {
       yearlyMid: weeklyMid * 52,
     };
   }, [selectedPkg, amountZAR]);
+
+  const displayProjections = useMemo(() => {
+    if (!projections) return null;
+
+    return {
+      weeklyMin: projections.weeklyMin / currency.toZAR,
+      weeklyMax: projections.weeklyMax / currency.toZAR,
+      monthlyMid: projections.monthlyMid / currency.toZAR,
+      yearlyMid: projections.yearlyMid / currency.toZAR,
+    };
+  }, [projections, currency.toZAR]);
 
   // Investment rules validation
   const validateInvestment = (): string | null => {
@@ -181,6 +199,24 @@ export default function InvestPage() {
     };
     saveInvestment(inv);
     setStep("success");
+  };
+
+  const handleCurrencyChange = (nextCurrencyCode: CurrencyCode) => {
+    const nextCurrency = getCurrencyByCode(nextCurrencyCode);
+
+    if (nextCurrency.code === currency.code) {
+      setShowCurrencyDropdown(false);
+      return;
+    }
+
+    if (amountNum > 0) {
+      const convertedAmount = amountZAR / nextCurrency.toZAR;
+      setAmount(String(roundCurrencyAmount(convertedAmount)));
+    }
+
+    setCurrencyCode(nextCurrencyCode);
+    setError("");
+    setShowCurrencyDropdown(false);
   };
 
   if (isLoading || !user) {
@@ -304,7 +340,7 @@ export default function InvestPage() {
                   <h3 className="text-white text-sm font-semibold mb-4">Investment Amount</h3>
 
                   {/* Currency Selector */}
-                  <div className="relative mb-4">
+                  <div className="relative mb-3">
                     <button
                       onClick={() => setShowCurrencyDropdown(!showCurrencyDropdown)}
                       className="flex items-center gap-2 px-3 py-2 rounded-xl border border-white/[0.06] bg-white/[0.02] hover:bg-white/[0.04] transition-colors text-sm w-full"
@@ -323,26 +359,32 @@ export default function InvestPage() {
                           animate={{ opacity: 1, y: 0 }}
                           exit={{ opacity: 0, y: -4 }}
                         >
-                          {currencies.map((c, i) => (
+                          {supportedCurrencies.map((c) => (
                             <button
                               key={c.code}
-                              onClick={() => {
-                                setSelectedCurrency(i);
-                                setShowCurrencyDropdown(false);
-                              }}
+                              onClick={() => handleCurrencyChange(c.code)}
                               className={`flex items-center gap-2.5 px-3 py-2.5 w-full hover:bg-white/[0.03] transition-colors ${
-                                selectedCurrency === i ? "bg-[#D4AF37]/[0.04]" : ""
+                                currency.code === c.code ? "bg-[#D4AF37]/[0.04]" : ""
                               }`}
                             >
                               <span className="text-base">{c.flag}</span>
                               <span className="text-white text-xs font-medium w-10">{c.code}</span>
                               <span className="text-[#555] text-[10px] flex-1 text-left">{c.name}</span>
-                              {selectedCurrency === i && <Check size={12} className="text-[#D4AF37]" />}
+                              {currency.code === c.code && <Check size={12} className="text-[#D4AF37]" />}
                             </button>
                           ))}
                         </motion.div>
                       )}
                     </AnimatePresence>
+                  </div>
+
+                  <div className="flex items-center justify-between gap-3 mb-4">
+                    <p className="text-[#444] text-[10px] leading-relaxed">
+                      Currency is auto-selected from the browser region, and you can change it anytime.
+                    </p>
+                    <span className="text-[#D4AF37] text-[10px] uppercase tracking-[0.18em] whitespace-nowrap">
+                      {currencySource === "saved" ? "Saved" : "Auto"}
+                    </span>
                   </div>
 
                   {/* Amount Input */}
@@ -366,21 +408,24 @@ export default function InvestPage() {
                   {/* ZAR equivalent */}
                   {currency.code !== "ZAR" && amountNum > 0 && (
                     <p className="text-[#555] text-xs mb-4">
-                      ≈ R{amountZAR.toLocaleString("en-ZA", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ZAR
+                      Approx. {formatCurrencyAmount(amountZAR, zarCurrency)}
                     </p>
                   )}
 
                   {/* Quick amounts */}
                   <div className="flex flex-wrap gap-2 mb-5">
                     {[1000, 3000, 5000, 10000, 25000, 50000].map((v) => {
-                      const converted = v * currency.rate;
+                      const converted = v / currency.toZAR;
                       return (
                         <button
                           key={v}
-                          onClick={() => setAmount(String(Math.round(converted * 100) / 100))}
+                          onClick={() => setAmount(String(roundCurrencyAmount(converted)))}
                           className="px-3 py-1.5 rounded-lg border border-white/[0.06] bg-white/[0.02] text-[#666] text-[10px] font-medium hover:border-[#D4AF37]/20 hover:text-[#D4AF37] transition-all"
                         >
-                          {currency.symbol}{converted < 1 ? converted.toFixed(6) : Math.round(converted).toLocaleString()}
+                          {formatCurrencyAmount(converted, currency, {
+                            minimumFractionDigits: converted < 1 ? 4 : 0,
+                            maximumFractionDigits: converted < 1 ? 6 : 0,
+                          })}
                         </button>
                       );
                     })}
@@ -457,31 +502,67 @@ export default function InvestPage() {
                 <div className="lg:col-span-2 bg-[#0a0a0e] border border-white/[0.04] rounded-xl p-5 md:p-6">
                   <h3 className="text-white text-sm font-semibold mb-4">Projected Returns</h3>
 
-                  {selectedPkg && projections ? (
+                  {selectedPkg && projections && displayProjections ? (
                     <>
                       <div className="space-y-4 mb-6">
                         <div className="bg-white/[0.02] border border-white/[0.03] rounded-xl p-4">
                           <p className="text-[#555] text-[10px] uppercase tracking-wider mb-1">Weekly Return</p>
                           <p className="text-emerald-400 text-xl font-bold font-display">
-                            R{projections.weeklyMin.toLocaleString("en-ZA", { maximumFractionDigits: 0 })} – R{projections.weeklyMax.toLocaleString("en-ZA", { maximumFractionDigits: 0 })}
+                            {formatCurrencyAmount(displayProjections.weeklyMin, currency, {
+                              minimumFractionDigits: 0,
+                              maximumFractionDigits: 0,
+                            })} - {formatCurrencyAmount(displayProjections.weeklyMax, currency, {
+                              minimumFractionDigits: 0,
+                              maximumFractionDigits: 0,
+                            })}
                           </p>
-                          <p className="text-[#444] text-[10px] mt-0.5">Every 7 days</p>
+                          <p className="text-[#444] text-[10px] mt-0.5">
+                            Every 7 days
+                            {currency.code !== "ZAR" &&
+                              ` • Approx. ${formatCurrencyAmount(projections.weeklyMin, zarCurrency, {
+                                minimumFractionDigits: 0,
+                                maximumFractionDigits: 0,
+                              })} - ${formatCurrencyAmount(projections.weeklyMax, zarCurrency, {
+                                minimumFractionDigits: 0,
+                                maximumFractionDigits: 0,
+                              })}`}
+                          </p>
                         </div>
 
                         <div className="bg-white/[0.02] border border-white/[0.03] rounded-xl p-4">
                           <p className="text-[#555] text-[10px] uppercase tracking-wider mb-1">Monthly Estimate</p>
                           <p className="text-[#D4AF37] text-xl font-bold font-display">
-                            R{projections.monthlyMid.toLocaleString("en-ZA", { maximumFractionDigits: 0 })}
+                            {formatCurrencyAmount(displayProjections.monthlyMid, currency, {
+                              minimumFractionDigits: 0,
+                              maximumFractionDigits: 0,
+                            })}
                           </p>
-                          <p className="text-[#444] text-[10px] mt-0.5">Based on avg. {selectedPkg.rateMid}%/week</p>
+                          <p className="text-[#444] text-[10px] mt-0.5">
+                            Based on avg. {selectedPkg.rateMid}%/week
+                            {currency.code !== "ZAR" &&
+                              ` • Approx. ${formatCurrencyAmount(projections.monthlyMid, zarCurrency, {
+                                minimumFractionDigits: 0,
+                                maximumFractionDigits: 0,
+                              })}`}
+                          </p>
                         </div>
 
                         <div className="bg-white/[0.02] border border-white/[0.03] rounded-xl p-4">
                           <p className="text-[#555] text-[10px] uppercase tracking-wider mb-1">Annual Projection</p>
                           <p className="text-white text-xl font-bold font-display">
-                            R{projections.yearlyMid.toLocaleString("en-ZA", { maximumFractionDigits: 0 })}
+                            {formatCurrencyAmount(displayProjections.yearlyMid, currency, {
+                              minimumFractionDigits: 0,
+                              maximumFractionDigits: 0,
+                            })}
                           </p>
-                          <p className="text-[#444] text-[10px] mt-0.5">52 weeks compounding</p>
+                          <p className="text-[#444] text-[10px] mt-0.5">
+                            52 weeks compounding
+                            {currency.code !== "ZAR" &&
+                              ` • Approx. ${formatCurrencyAmount(projections.yearlyMid, zarCurrency, {
+                                minimumFractionDigits: 0,
+                                maximumFractionDigits: 0,
+                              })}`}
+                          </p>
                         </div>
                       </div>
 
@@ -522,7 +603,7 @@ export default function InvestPage() {
           )}
 
           {/* Step 2: Confirm */}
-          {step === "confirm" && selectedPkg && projections && (
+          {step === "confirm" && selectedPkg && projections && displayProjections && (
             <motion.div
               key="confirm"
               initial={{ opacity: 0, y: 10 }}
@@ -542,9 +623,16 @@ export default function InvestPage() {
                   <div className="flex items-center justify-between py-3 border-b border-white/[0.04]">
                     <span className="text-[#555] text-xs">Amount</span>
                     <div className="text-right">
-                      <span className="text-white text-sm font-semibold">{formatCurrency(amountNum, currency.symbol)}</span>
+                      <span className="text-white text-sm font-semibold">
+                        {formatCurrencyAmount(amountNum, currency)}
+                      </span>
                       {currency.code !== "ZAR" && (
-                        <p className="text-[#444] text-[10px]">≈ R{amountZAR.toLocaleString("en-ZA", { maximumFractionDigits: 0 })}</p>
+                        <p className="text-[#444] text-[10px]">
+                          Approx. {formatCurrencyAmount(amountZAR, zarCurrency, {
+                            minimumFractionDigits: 0,
+                            maximumFractionDigits: 0,
+                          })}
+                        </p>
                       )}
                     </div>
                   </div>
@@ -558,9 +646,28 @@ export default function InvestPage() {
                   </div>
                   <div className="flex items-center justify-between py-3 border-b border-white/[0.04]">
                     <span className="text-[#555] text-xs">Weekly Return (est.)</span>
-                    <span className="text-emerald-400 text-sm font-semibold">
-                      R{projections.weeklyMin.toLocaleString("en-ZA", { maximumFractionDigits: 0 })} – R{projections.weeklyMax.toLocaleString("en-ZA", { maximumFractionDigits: 0 })}
-                    </span>
+                    <div className="text-right">
+                      <span className="text-emerald-400 text-sm font-semibold">
+                        {formatCurrencyAmount(displayProjections.weeklyMin, currency, {
+                          minimumFractionDigits: 0,
+                          maximumFractionDigits: 0,
+                        })} - {formatCurrencyAmount(displayProjections.weeklyMax, currency, {
+                          minimumFractionDigits: 0,
+                          maximumFractionDigits: 0,
+                        })}
+                      </span>
+                      {currency.code !== "ZAR" && (
+                        <p className="text-[#444] text-[10px]">
+                          Approx. {formatCurrencyAmount(projections.weeklyMin, zarCurrency, {
+                            minimumFractionDigits: 0,
+                            maximumFractionDigits: 0,
+                          })} - {formatCurrencyAmount(projections.weeklyMax, zarCurrency, {
+                            minimumFractionDigits: 0,
+                            maximumFractionDigits: 0,
+                          })}
+                        </p>
+                      )}
+                    </div>
                   </div>
                   <div className="flex items-center justify-between py-3">
                     <span className="text-[#555] text-xs">Return Rate</span>
@@ -602,7 +709,7 @@ export default function InvestPage() {
                 </div>
                 <h2 className="text-white text-xl font-display font-semibold mb-2">Investment Successful!</h2>
                 <p className="text-[#555] text-sm mb-6">
-                  Your {formatCurrency(amountNum, currency.symbol)} investment in the {selectedPkg.name} package has been processed.
+                  Your {formatCurrencyAmount(amountNum, currency)} investment in the {selectedPkg.name} package has been processed.
                 </p>
 
                 <div className="bg-white/[0.02] border border-white/[0.03] rounded-xl p-4 mb-6 text-left">

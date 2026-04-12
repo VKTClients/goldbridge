@@ -4,20 +4,26 @@ import { useState } from "react";
 import { X, Copy, Check, Wallet, AlertCircle, ArrowRight, Clock, ExternalLink } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/context/AuthContext";
+import {
+  DEPOSIT_WALLET_ADDRESS,
+  DEPOSIT_WALLET_NAME,
+  DEPOSIT_WALLET_NETWORK,
+  DEPOSIT_WALLET_SYMBOL,
+} from "@/lib/depositWallet";
 
 interface DepositModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
-const LUNO_DEPOSIT_ADDRESS = "0x0F49B970d2100C2c1799c8b9993ed3f3B7F6A49A";
+const LUNO_DEPOSIT_ADDRESS = DEPOSIT_WALLET_ADDRESS;
 
 const DEPOSIT_WALLET = {
   id: "usdt",
-  name: "USDT (ERC-20)",
-  symbol: "USDT",
+  name: DEPOSIT_WALLET_NAME,
+  symbol: DEPOSIT_WALLET_SYMBOL,
   address: LUNO_DEPOSIT_ADDRESS,
-  network: "ERC-20 Network",
+  network: DEPOSIT_WALLET_NETWORK,
   color: "text-emerald-400",
   bgColor: "bg-emerald-500/10",
   borderColor: "border-emerald-500/20",
@@ -173,7 +179,7 @@ export default function DepositModal({ isOpen, onClose }: DepositModalProps) {
                   <div>
                     <h4 className="text-white font-semibold mb-3">Payment Method</h4>
                     <div className={`flex flex-col items-center gap-2 p-4 rounded-xl border ${wallet.bgColor} ${wallet.borderColor} ${wallet.color}`}>
-                      <span className="text-2xl font-bold">{wallet.icon}</span>
+                      <span className="text-2xl font-bold">{wallet.symbol}</span>
                       <span className="text-sm font-semibold">{wallet.name}</span>
                       <span className="text-xs opacity-80">{wallet.network}</span>
                     </div>
@@ -276,7 +282,7 @@ export default function DepositModal({ isOpen, onClose }: DepositModalProps) {
                 >
                   <div className="flex items-center gap-3 mb-5">
                     <div className={`w-10 h-10 rounded-full ${wallet.bgColor} border ${wallet.borderColor} flex items-center justify-center`}>
-                      <span className={`text-lg font-bold ${wallet.color}`}>{wallet.icon}</span>
+                      <span className={`text-lg font-bold ${wallet.color}`}>{wallet.symbol}</span>
                     </div>
                     <div>
                       <h2 className="text-white text-lg font-display font-semibold">

@@ -22,10 +22,45 @@ import AuthModal from "@/components/AuthModal";
 import Chatbot from "@/components/Chatbot";
 import Newsletter from "@/components/Newsletter";
 import HashScroller from "@/components/HashScroller";
+import { absoluteUrl, buildMetadata, defaultDescription, siteName } from "@/lib/seo";
+
+export const metadata = buildMetadata({
+  title: "Premium Asset Management",
+  description: defaultDescription,
+  path: "/",
+  keywords: [
+    "Goldbridge Capital",
+    "premium asset management",
+    "wealth management",
+    "investment platform",
+    "capital growth",
+  ],
+});
 
 export default function Home() {
+  const homePageSchema = {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "@id": absoluteUrl("/#webpage"),
+    name: `${siteName} | Premium Asset Management`,
+    url: absoluteUrl("/"),
+    description: defaultDescription,
+    isPartOf: {
+      "@id": absoluteUrl("/#website"),
+    },
+    about: {
+      "@id": absoluteUrl("/#organization"),
+    },
+  };
+
   return (
     <div className="min-h-screen bg-[#060608]">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(homePageSchema),
+        }}
+      />
       <HashScroller />
       <PageLoader />
       <CursorGlow />
