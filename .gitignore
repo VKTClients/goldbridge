@@ -191,3 +191,6 @@ dist/
 # OS
 .DS_Store
 Thumbs.db
+
+# Local nested repository (not tracked here)
+goldbridge/
