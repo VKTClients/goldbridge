@@ -369,7 +369,8 @@ export default function DashboardPage() {
         )}
       </AnimatePresence>
 
-<div className="min-h-screen bg-[#060608] flex">
+      {!showDepositGuide && (
+        <div className="min-h-screen bg-[#060608] flex">
       {/* Sidebar — Desktop */}
       <aside className="hidden md:flex flex-col w-[240px] bg-[#09090c] border-r border-white/[0.04] fixed top-0 left-0 h-screen z-40">
         <a href="/" className="flex items-center gap-3 px-5 h-[72px] border-b border-white/[0.04]">
@@ -1249,7 +1250,8 @@ export default function DashboardPage() {
           )}
         </div>
       </main>
-    </div>
+        </div>
+      )}
     </>
   );
 }

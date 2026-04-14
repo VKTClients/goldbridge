@@ -157,10 +157,10 @@ export default function DepositModal({ isOpen, onClose }: DepositModalProps) {
                     </div>
                     <div>
                       <h2 className="text-white text-lg font-display font-semibold">
-                        Deposit Funds
+                        Submit Proof of Payment
                       </h2>
                       <p className="text-[#555] text-xs">
-                        Send USDT via ERC-20 network
+                        Confirm your USDT transfer details
                       </p>
                     </div>
                   </div>
@@ -170,7 +170,7 @@ export default function DepositModal({ isOpen, onClose }: DepositModalProps) {
                     <div className="flex items-start gap-2">
                       <AlertCircle size={14} className="text-[#D4AF37] mt-0.5 flex-shrink-0" />
                       <p className="text-[#888] text-[10px] leading-relaxed">
-                        Send <span className="text-emerald-400 font-semibold">USDT (ERC-20)</span> to the wallet address below. After sending, enter the amount and submit. Our team will verify and credit your account.
+                        Send <span className="text-emerald-400 font-semibold">USDT (ERC-20)</span> to the wallet address below. After sending, enter your transfer amount and submit proof for verification.
                       </p>
                     </div>
                   </div>
@@ -221,7 +221,7 @@ export default function DepositModal({ isOpen, onClose }: DepositModalProps) {
                       className="flex items-center justify-center gap-2 w-full mt-3 py-2.5 px-4 bg-[#0055FF]/10 border border-[#0055FF]/30 rounded-xl text-[#4A90FF] text-xs font-medium hover:bg-[#0055FF]/20 transition-colors"
                     >
                       <ExternalLink size={14} />
-                      Deposit via Luno (Address copied)
+                      Open Luno Send (Address copied)
                     </a>
                     <p className="text-[#444] text-[9px] mt-1.5">
                       Only send <span className={wallet.color}>{wallet.symbol}</span> on the <span className="text-white">{wallet.network}</span>. Sending other assets may result in permanent loss.
@@ -267,7 +267,7 @@ export default function DepositModal({ isOpen, onClose }: DepositModalProps) {
                     disabled={!amount || parseFloat(amount) < 500}
                     className="btn-gold w-full py-3.5 text-sm font-semibold gap-2 justify-center disabled:opacity-30 disabled:cursor-not-allowed"
                   >
-                    Continue
+                    Continue to Confirmation
                     <ArrowRight size={14} />
                   </button>
                   {amount && parseFloat(amount) < 500 && (
