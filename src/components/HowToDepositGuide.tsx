@@ -312,14 +312,14 @@ export default function HowToDepositGuide({
           </header>
 
           <div className="flex-1 overflow-hidden">
-            <div className="h-full max-w-5xl mx-auto px-4 sm:px-6 md:px-8 py-3">
+            <div className="h-full max-w-[1320px] mx-auto px-4 sm:px-6 md:px-8 py-3">
               <motion.div
                 key={currentStep.id}
                 initial={{ opacity: 0, y: 18 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -18 }}
                 transition={{ duration: 0.24, ease: "easeOut" }}
-                className="mx-auto h-full max-w-4xl"
+                className="mx-auto h-full w-full max-w-6xl"
               >
                 <section className="relative h-full overflow-hidden rounded-[24px] border border-white/[0.07] bg-[#0B0B0E] p-4 sm:p-5 md:p-6 shadow-[0_14px_36px_rgba(0,0,0,0.28)]">
 
@@ -340,24 +340,26 @@ export default function HowToDepositGuide({
                     </div>
                   </div>
 
-                  <div className="relative z-10 rounded-2xl border border-white/[0.07] bg-[#070709] p-3.5 sm:p-4">
-                    <ul className="space-y-2.5">
-                      {currentStep.bullets.map((bullet) => (
-                        <li
-                          key={bullet}
-                          className="flex items-start gap-2.5 text-[#D5D5D5] text-[13px] sm:text-sm leading-relaxed"
-                        >
-                          <span className="mt-1.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-emerald-500/12 text-emerald-400">
-                            <Check size={12} />
-                          </span>
-                          <span>{bullet}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                  <div className="relative z-10 mt-3 rounded-2xl border border-white/[0.07] bg-[#09090B] p-3.5 sm:p-4">
-                    {currentStep.id === "send-usdt" ? (
-                      <div>
+                  <div className="relative z-10 mt-3 grid gap-3 lg:grid-cols-[1.12fr_0.88fr]">
+                    <div className="rounded-2xl border border-white/[0.07] bg-[#070709] p-3.5 sm:p-4">
+                      <ul className="space-y-2.5">
+                        {currentStep.bullets.map((bullet) => (
+                          <li
+                            key={bullet}
+                            className="flex items-start gap-2.5 text-[#D5D5D5] text-[13px] sm:text-sm leading-relaxed"
+                          >
+                            <span className="mt-1.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-emerald-500/12 text-emerald-400">
+                              <Check size={12} />
+                            </span>
+                            <span>{bullet}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+
+                    <div className="rounded-2xl border border-white/[0.07] bg-[#09090B] p-3.5 sm:p-4">
+                      {currentStep.id === "send-usdt" ? (
+                        <div>
                         <div className="inline-flex items-center gap-2 rounded-full border border-red-500/20 bg-red-500/[0.08] px-3 py-1.5 text-[10px] uppercase tracking-[0.2em] text-red-300 mb-4">
                           <ShieldAlert size={12} />
                           ERC-20 only
@@ -412,38 +414,39 @@ export default function HowToDepositGuide({
                             </div>
                           </div>
                         </div>
-                      </div>
-                    ) : (
-                      <div>
+                        </div>
+                      ) : (
+                        <div>
                         <p className="text-[#D4AF37] text-[10px] uppercase tracking-[0.22em] mb-3">
                           {currentStep.panelTitle}
                         </p>
-                        <div className="space-y-3">
+                        <div className="grid grid-cols-2 gap-2">
                           {currentStep.panelItems?.map((item) => (
                             <div
                               key={item}
-                              className="flex items-center gap-3 rounded-2xl border border-white/[0.07] bg-[#0A0A0C] px-4 py-3.5"
+                              className="flex items-center gap-2 rounded-xl border border-white/[0.07] bg-[#0A0A0C] px-3 py-2.5"
                             >
-                              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#D4AF37]/10 text-[#D4AF37]">
-                                <Check size={14} />
+                              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#D4AF37]/10 text-[#D4AF37]">
+                                <Check size={12} />
                               </span>
-                              <span className="text-white text-sm leading-relaxed">{item}</span>
+                              <span className="text-white text-xs leading-snug">{item}</span>
                             </div>
                           ))}
                         </div>
 
-                        <div className="mt-4 rounded-2xl border border-white/[0.07] bg-[#070709] p-4">
-                          <p className="text-white text-sm font-semibold mb-2">
+                        <div className="mt-3 rounded-2xl border border-white/[0.07] bg-[#070709] p-3">
+                          <p className="text-white text-xs font-semibold mb-1.5">
                             {currentStep.id === "confirmation" ? "Finish strong" : "Why this step matters"}
                           </p>
-                          <p className="text-[#666] text-sm leading-relaxed">
+                          <p className="text-[#666] text-xs leading-relaxed">
                             {currentStep.id === "confirmation"
                               ? "When the transfer is done, keep your proof of payment ready and use the final actions below to move straight into the next stage."
                               : "This flow stays linear on purpose: one clear action at a time, a visible sense of progress, and no long scrolling page to keep track of."}
                           </p>
                         </div>
-                      </div>
-                    )}
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </section>
               </motion.div>
@@ -453,7 +456,7 @@ export default function HowToDepositGuide({
           <footer className="border-t border-white/[0.05] bg-[#050507]/97 backdrop-blur-xl">
             <div className="max-w-[1320px] mx-auto px-4 sm:px-6 md:px-8 py-2.5">
               <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                <div className="text-[#555] text-xs leading-relaxed">
+                <div className="hidden sm:block text-[#555] text-xs leading-relaxed">
                   {activeStep === GUIDE_STEPS.length - 1
                     ? "Review the transfer details one last time before moving forward."
                     : "Complete the current step, then continue when you are ready."}
