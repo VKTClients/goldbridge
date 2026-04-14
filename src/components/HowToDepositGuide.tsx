@@ -226,7 +226,7 @@ export default function HowToDepositGuide({
           role="dialog"
           aria-modal="true"
           aria-labelledby="deposit-guide-title"
-          className="relative flex h-full flex-col"
+          className="relative flex h-full min-h-0 flex-col"
         >
           <header className="border-b border-white/[0.05] bg-[#050507]/96 backdrop-blur-xl">
             <div className="max-w-[1320px] mx-auto px-4 sm:px-6 md:px-8 py-2.5">
@@ -287,7 +287,7 @@ export default function HowToDepositGuide({
                 />
               </div>
 
-              <div className="mt-2.5 flex gap-2 overflow-hidden">
+              <div className="mt-2.5 flex gap-2 overflow-x-auto sm:overflow-hidden [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                 {GUIDE_STEPS.map((step, index) => {
                   const isActive = index === activeStep;
                   const isComplete = index < activeStep;
@@ -295,15 +295,16 @@ export default function HowToDepositGuide({
                   return (
                     <div
                       key={step.id}
-                      className={`min-w-0 rounded-full border px-2.5 py-1.5 text-[9px] uppercase tracking-[0.12em] transition-colors truncate ${
+                      className={`shrink-0 rounded-full border px-2.5 py-1.5 text-[9px] uppercase tracking-[0.12em] transition-[max-width,color,border-color,background-color] duration-250 whitespace-nowrap overflow-hidden ${
                         isActive
                           ? "border-[#D4AF37]/35 bg-[#D4AF37]/12 text-[#F3D889]"
                           : isComplete
                             ? "border-emerald-500/20 bg-emerald-500/[0.06] text-emerald-300"
                             : "border-white/[0.08] bg-transparent text-[#666]"
-                      }`}
+                      } ${isActive ? "max-w-[14rem] sm:max-w-none" : "max-w-[4.5rem] sm:max-w-none"}`}
                     >
-                      {index + 1}. {step.title}
+                      <span className="sm:hidden">{isActive ? `${index + 1}. ${step.title}` : `${index + 1}.`}</span>
+                      <span className="hidden sm:inline">{index + 1}. {step.title}</span>
                     </div>
                   );
                 })}
@@ -311,8 +312,8 @@ export default function HowToDepositGuide({
             </div>
           </header>
 
-          <div className="flex-1 overflow-hidden">
-            <div className="h-full max-w-[1320px] mx-auto px-4 sm:px-6 md:px-8 py-3">
+          <div className="flex-1 min-h-0 overflow-hidden">
+            <div className="h-full max-w-[1320px] mx-auto px-4 sm:px-6 md:px-8 py-3 overflow-y-auto sm:overflow-hidden">
               <motion.div
                 key={currentStep.id}
                 initial={{ opacity: 0, y: 18 }}
@@ -321,7 +322,7 @@ export default function HowToDepositGuide({
                 transition={{ duration: 0.24, ease: "easeOut" }}
                 className="mx-auto h-full w-full max-w-6xl"
               >
-                <section className="relative h-full overflow-hidden rounded-[24px] border border-white/[0.07] bg-[#0B0B0E] p-4 sm:p-5 md:p-6 shadow-[0_14px_36px_rgba(0,0,0,0.28)]">
+                <section className="relative h-full overflow-y-auto sm:overflow-hidden rounded-[24px] border border-white/[0.07] bg-[#0B0B0E] p-4 sm:p-5 md:p-6 shadow-[0_14px_36px_rgba(0,0,0,0.28)]">
 
                   <div className="relative z-10 flex items-start gap-3 mb-4">
                     <div className="w-11 h-11 rounded-2xl bg-[#D4AF37]/10 border border-[#D4AF37]/20 flex items-center justify-center flex-shrink-0">
