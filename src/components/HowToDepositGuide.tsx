@@ -33,14 +33,14 @@ const GUIDE_STEPS = [
     id: "create-account",
     icon: Smartphone,
     title: "Create Luno Account",
-    summary: "Set up your Luno account before you try to fund or send anything.",
+    summary: "Set up your Luno account first.",
     bullets: [
-      "Open the Luno app and tap Create Account.",
-      "Enter your email and create a password.",
-      "Confirm your email via the link sent to you.",
+      "Open Luno and tap Create Account.",
+      "Enter email and create a password.",
+      "Confirm your email link.",
       "Set your security PIN.",
-      "Add and verify your phone number.",
-      "Select your country of residence.",
+      "Verify your phone number.",
+      "Select your country.",
     ],
     panelTitle: "Ready to use",
     panelItems: [
@@ -54,14 +54,13 @@ const GUIDE_STEPS = [
     id: "deposit-funds",
     icon: Landmark,
     title: "Deposit Funds",
-    summary: "Add money to your Luno wallet before buying Tether.",
+    summary: "Add money to your local wallet.",
     bullets: [
-      "Log in and go to Wallets.",
-      "Select your local currency wallet.",
-      "Tap Deposit.",
-      "Choose your payment method.",
-      "Use the exact reference number provided.",
-      "Complete payment via your banking app.",
+      "Go to Wallets.",
+      "Choose your local currency wallet.",
+      "Tap Deposit and pick payment method.",
+      "Use the exact reference number.",
+      "Complete transfer in your banking app.",
     ],
     panelTitle: "Before you continue",
     panelItems: [
@@ -75,11 +74,11 @@ const GUIDE_STEPS = [
     id: "buy-usdt",
     icon: BadgeCheck,
     title: "Buy USDT",
-    summary: "Convert your funded balance into Tether inside Luno.",
+    summary: "Convert your balance to USDT.",
     bullets: [
       "Go to Portfolio and tap Buy Crypto.",
       "Select Tether (USDT).",
-      "Choose One-Time or Recurring Purchase.",
+      "Choose one-time or recurring buy.",
       "Enter your amount and confirm.",
     ],
     panelTitle: "Success check",
@@ -94,11 +93,11 @@ const GUIDE_STEPS = [
     id: "send-usdt",
     icon: Wallet,
     title: "Send USDT",
-    summary: "Send your USDT to the official Gold Bridge Capital wallet below.",
+    summary: "Send USDT to the official wallet below.",
     bullets: [
       "Open your USDT wallet.",
       "Tap Send or Withdraw.",
-      "Paste the wallet address shown on this screen.",
+      "Paste the wallet address shown here.",
       "Select Ethereum (ERC-20).",
       "Enter the amount and confirm the transfer.",
     ],
@@ -107,19 +106,19 @@ const GUIDE_STEPS = [
     id: "confirmation",
     icon: BadgeCheck,
     title: "Confirmation / Final Step",
-    summary: "Finish the handoff after your transfer has been sent.",
+    summary: "Finish after your transfer is sent.",
     bullets: [
-      "Keep your transaction hash or screenshot as proof of payment.",
-      "Submit Proof of Payment once your transfer is complete.",
-      "Proceed to Investment to continue your onboarding.",
-      "Contact support if you need help at any point.",
+      "Keep your TX hash or screenshot.",
+      "Submit Proof of Payment.",
+      "Proceed to Investment.",
+      "Contact support if needed.",
     ],
     panelTitle: "Security tips",
     panelItems: [
-      "Always double-check the wallet address",
-      "Ensure ERC-20 network is selected",
-      "Never share your PIN or login details",
-      "Only use official Gold Bridge Capital details",
+      "Double-check the wallet address",
+      "Use ERC-20 only",
+      "Never share PIN/login details",
+      "Use official Gold Bridge details",
     ],
   },
 ] as const;
@@ -229,15 +228,15 @@ export default function HowToDepositGuide({
           aria-labelledby="deposit-guide-title"
           className="relative flex h-full flex-col"
         >
-          <header className="border-b border-white/[0.05] bg-[#050507]/92 backdrop-blur-xl">
-            <div className="max-w-[1320px] mx-auto px-4 sm:px-6 md:px-8 py-4 md:py-5 max-[740px]:py-3">
-              <div className="flex items-start gap-3 sm:gap-4">
+          <header className="border-b border-white/[0.05] bg-[#050507]/96 backdrop-blur-xl">
+            <div className="max-w-[1320px] mx-auto px-4 sm:px-6 md:px-8 py-2.5">
+              <div className="flex items-center gap-2 sm:gap-3">
                 <button
                   type="button"
                   onClick={onClose}
-                  className="inline-flex h-11 min-w-[44px] items-center justify-center gap-2 rounded-full border border-white/[0.08] bg-white/[0.03] px-4 text-sm font-medium text-[#C9C9C9] hover:border-white/[0.14] hover:text-white transition-colors"
+                  className="inline-flex h-9 min-w-[36px] items-center justify-center gap-1.5 rounded-full border border-white/[0.08] bg-white/[0.03] px-3 text-xs font-medium text-[#C9C9C9] hover:border-white/[0.14] hover:text-white transition-colors"
                 >
-                  <X size={16} />
+                  <X size={14} />
                   <span className="hidden sm:inline">Exit</span>
                 </button>
 
@@ -245,43 +244,35 @@ export default function HowToDepositGuide({
                   <p className="text-[#D4AF37] text-[10px] uppercase tracking-[0.26em] mb-1.5">
                     Gold Bridge Capital - Luno USDT Guide
                   </p>
-                  <h2
-                    id="deposit-guide-title"
-                    ref={titleRef}
-                    tabIndex={-1}
-                    className="text-white text-lg sm:text-xl md:text-2xl max-[740px]:text-base font-display font-semibold tracking-tight outline-none"
-                  >
-                    Immersive 5-step deposit flow
+                  <h2 id="deposit-guide-title" ref={titleRef} tabIndex={-1} className="sr-only">
+                    Deposit guide
                   </h2>
-                  <p className="text-[#666] text-xs sm:text-sm mt-1.5 max-w-2xl max-[740px]:hidden">
-                    One step is shown at a time for a focused, mobile-first flow.
-                  </p>
                 </div>
 
                 <button
                   type="button"
                   onClick={onNeedHelp}
-                  className="inline-flex h-11 min-w-[44px] items-center justify-center gap-2 rounded-full border border-[#D4AF37]/25 bg-[#D4AF37]/10 px-4 text-sm font-semibold text-[#F3D889] hover:border-[#D4AF37]/40 hover:text-white transition-colors"
+                  className="inline-flex h-9 min-w-[36px] items-center justify-center gap-1.5 rounded-full border border-[#D4AF37]/25 bg-[#D4AF37]/10 px-3 text-xs font-semibold text-[#F3D889] hover:border-[#D4AF37]/40 hover:text-white transition-colors"
                 >
-                  <HelpCircle size={16} />
+                  <HelpCircle size={14} />
                   <span className="hidden sm:inline">Need Help?</span>
                 </button>
               </div>
 
-              <div className="mt-4 flex items-center justify-between gap-3 max-[740px]:mt-3">
+              <div className="mt-2.5 flex items-center justify-between gap-3">
                 <div>
-                  <p className="text-white text-sm font-semibold">
+                  <p className="text-white text-xs font-semibold">
                     Step {activeStep + 1} of {GUIDE_STEPS.length}
                   </p>
-                  <p className="text-[#555] text-[10px] uppercase tracking-[0.18em] mt-1">
+                  <p className="text-[#555] text-[9px] uppercase tracking-[0.16em] mt-0.5">
                     Guided progress
                   </p>
                 </div>
-                <p className="text-white text-xl md:text-2xl font-display font-semibold">{progress}%</p>
+                <p className="text-white text-lg font-display font-semibold">{progress}%</p>
               </div>
 
               <div
-                className="mt-3 h-2.5 rounded-full bg-white/[0.05] overflow-hidden"
+                className="mt-2 h-2 rounded-full bg-white/[0.05] overflow-hidden"
                 role="progressbar"
                 aria-valuemin={0}
                 aria-valuemax={100}
@@ -296,7 +287,7 @@ export default function HowToDepositGuide({
                 />
               </div>
 
-              <div className="mt-4 flex gap-2 overflow-x-auto pb-1 max-[740px]:mt-3">
+              <div className="mt-2.5 flex gap-2 overflow-hidden">
                 {GUIDE_STEPS.map((step, index) => {
                   const isActive = index === activeStep;
                   const isComplete = index < activeStep;
@@ -304,7 +295,7 @@ export default function HowToDepositGuide({
                   return (
                     <div
                       key={step.id}
-                      className={`min-w-fit rounded-full border px-3 py-2 max-[740px]:px-2.5 max-[740px]:py-1.5 text-[10px] max-[740px]:text-[9px] uppercase tracking-[0.18em] transition-colors ${
+                      className={`min-w-0 rounded-full border px-2.5 py-1.5 text-[9px] uppercase tracking-[0.12em] transition-colors truncate ${
                         isActive
                           ? "border-[#D4AF37]/35 bg-[#D4AF37]/12 text-[#F3D889]"
                           : isComplete
@@ -320,41 +311,41 @@ export default function HowToDepositGuide({
             </div>
           </header>
 
-          <div className="flex-1 overflow-auto">
-            <div className="max-w-5xl mx-auto px-4 sm:px-6 md:px-8 py-4 md:py-6 max-[740px]:py-3">
+          <div className="flex-1 overflow-hidden">
+            <div className="h-full max-w-5xl mx-auto px-4 sm:px-6 md:px-8 py-3">
               <motion.div
                 key={currentStep.id}
                 initial={{ opacity: 0, y: 18 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -18 }}
                 transition={{ duration: 0.24, ease: "easeOut" }}
-                className="mx-auto max-w-4xl"
+                className="mx-auto h-full max-w-4xl"
               >
-                <section className="relative overflow-hidden rounded-[24px] border border-white/[0.07] bg-[#0B0B0E] p-5 sm:p-6 md:p-8 lg:p-10 max-[740px]:p-4 shadow-[0_14px_36px_rgba(0,0,0,0.28)]">
+                <section className="relative h-full overflow-hidden rounded-[24px] border border-white/[0.07] bg-[#0B0B0E] p-4 sm:p-5 md:p-6 shadow-[0_14px_36px_rgba(0,0,0,0.28)]">
 
-                  <div className="relative z-10 flex items-start gap-4 mb-6 max-[740px]:mb-4 max-[740px]:gap-3">
-                    <div className="w-14 h-14 max-[740px]:w-11 max-[740px]:h-11 rounded-2xl bg-[#D4AF37]/10 border border-[#D4AF37]/20 flex items-center justify-center flex-shrink-0">
+                  <div className="relative z-10 flex items-start gap-3 mb-4">
+                    <div className="w-11 h-11 rounded-2xl bg-[#D4AF37]/10 border border-[#D4AF37]/20 flex items-center justify-center flex-shrink-0">
                       <currentStep.icon size={24} className="text-[#D4AF37]" />
                     </div>
                     <div className="max-w-2xl">
                       <p className="text-[#D4AF37] text-[10px] uppercase tracking-[0.28em] mb-2">
                         Guided step {activeStep + 1}
                       </p>
-                      <h3 className="text-white text-2xl sm:text-3xl md:text-[2.5rem] max-[740px]:text-xl font-display font-semibold tracking-tight mb-3 max-[740px]:mb-2">
+                      <h3 className="text-white text-xl sm:text-2xl md:text-[2rem] font-display font-semibold tracking-tight mb-2">
                         {currentStep.title}
                       </h3>
-                      <p className="text-[#BEBEBE] text-sm sm:text-base max-[740px]:text-[13px] leading-relaxed">
+                      <p className="text-[#BEBEBE] text-sm leading-relaxed">
                         {currentStep.summary}
                       </p>
                     </div>
                   </div>
 
-                  <div className="relative z-10 rounded-2xl border border-white/[0.07] bg-[#070709] p-4 sm:p-5 md:p-6 max-[740px]:p-3.5">
-                    <ul className="space-y-3 md:space-y-4 max-[740px]:space-y-2.5">
+                  <div className="relative z-10 rounded-2xl border border-white/[0.07] bg-[#070709] p-3.5 sm:p-4">
+                    <ul className="space-y-2.5">
                       {currentStep.bullets.map((bullet) => (
                         <li
                           key={bullet}
-                          className="flex items-start gap-3 max-[740px]:gap-2.5 text-[#D5D5D5] text-sm md:text-[15px] max-[740px]:text-[13px] leading-relaxed"
+                          className="flex items-start gap-2.5 text-[#D5D5D5] text-[13px] sm:text-sm leading-relaxed"
                         >
                           <span className="mt-1.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-emerald-500/12 text-emerald-400">
                             <Check size={12} />
@@ -364,7 +355,7 @@ export default function HowToDepositGuide({
                       ))}
                     </ul>
                   </div>
-                  <div className="relative z-10 mt-4 max-[740px]:mt-3 rounded-2xl border border-white/[0.07] bg-[#09090B] p-4 sm:p-5 md:p-6 max-[740px]:p-3.5">
+                  <div className="relative z-10 mt-3 rounded-2xl border border-white/[0.07] bg-[#09090B] p-3.5 sm:p-4">
                     {currentStep.id === "send-usdt" ? (
                       <div>
                         <div className="inline-flex items-center gap-2 rounded-full border border-red-500/20 bg-red-500/[0.08] px-3 py-1.5 text-[10px] uppercase tracking-[0.2em] text-red-300 mb-4">
@@ -372,13 +363,13 @@ export default function HowToDepositGuide({
                           ERC-20 only
                         </div>
 
-                        <h4 className="text-white text-xl max-[740px]:text-lg font-semibold mb-2">Wallet address</h4>
-                        <p className="text-[#666] text-sm max-[740px]:text-[13px] leading-relaxed mb-5 max-[740px]:mb-4">
+                        <h4 className="text-white text-lg font-semibold mb-2">Wallet address</h4>
+                        <p className="text-[#666] text-[13px] leading-relaxed mb-4">
                           Send your USDT to the official Gold Bridge Capital wallet below and confirm the network is Ethereum ERC-20 before you send.
                         </p>
 
                         <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/[0.05] p-4 sm:p-5 mb-4">
-                          <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
+                          <div className="flex flex-wrap items-center justify-between gap-2.5 mb-3">
                             <div>
                               <p className="text-emerald-300 text-[10px] uppercase tracking-[0.2em] mb-1">
                                 Gold Bridge wallet
@@ -459,9 +450,9 @@ export default function HowToDepositGuide({
             </div>
           </div>
 
-          <footer className="border-t border-white/[0.05] bg-[#050507]/94 backdrop-blur-xl">
-            <div className="max-w-[1320px] mx-auto px-4 sm:px-6 md:px-8 py-4">
-              <div className="flex flex-col gap-3 max-[740px]:gap-2.5 sm:flex-row sm:items-center sm:justify-between">
+          <footer className="border-t border-white/[0.05] bg-[#050507]/97 backdrop-blur-xl">
+            <div className="max-w-[1320px] mx-auto px-4 sm:px-6 md:px-8 py-2.5">
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                 <div className="text-[#555] text-xs leading-relaxed">
                   {activeStep === GUIDE_STEPS.length - 1
                     ? "Review the transfer details one last time before moving forward."
@@ -473,7 +464,7 @@ export default function HowToDepositGuide({
                     <button
                       type="button"
                       onClick={handleBack}
-                      className="btn-outline w-full sm:w-auto px-6 py-3.5 text-sm gap-2"
+                      className="btn-outline w-full sm:w-auto px-5 py-2.5 text-xs gap-2"
                     >
                       <ArrowLeft size={16} />
                       Back
@@ -485,7 +476,7 @@ export default function HowToDepositGuide({
                       <button
                         type="button"
                         onClick={onSubmitProof}
-                        className="btn-gold w-full sm:w-auto px-7 py-3.5 text-sm gap-2"
+                        className="btn-gold w-full sm:w-auto px-6 py-2.5 text-xs gap-2"
                       >
                         Submit Proof of Payment
                         <ArrowRight size={16} />
@@ -493,7 +484,7 @@ export default function HowToDepositGuide({
                       <button
                         type="button"
                         onClick={onProceedToInvestment}
-                        className="btn-outline w-full sm:w-auto px-6 py-3.5 text-sm"
+                        className="btn-outline w-full sm:w-auto px-5 py-2.5 text-xs"
                       >
                         Proceed to Investment
                       </button>
@@ -502,7 +493,7 @@ export default function HowToDepositGuide({
                     <button
                       type="button"
                       onClick={handleNext}
-                      className="btn-gold w-full sm:w-auto px-7 py-3.5 text-sm gap-2"
+                      className="btn-gold w-full sm:w-auto px-6 py-2.5 text-xs gap-2"
                     >
                       Next Step
                       <ArrowRight size={16} />
