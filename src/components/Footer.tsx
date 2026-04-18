@@ -43,28 +43,16 @@ export default function Footer() {
             <a href="/terms" className="text-[#444] text-xs sm:text-[11px] hover:text-[#D4AF37] active:text-[#D4AF37] transition-colors py-1">Terms</a>
           </div>
 
-          {/* Social */}
-          <div className="flex items-center gap-3">
+          {/* Support */}
+          <div className="flex flex-col items-center md:items-end gap-1.5 text-center md:text-right">
+            <span className="text-[#333] text-[9px] uppercase tracking-[0.24em]">
+              Support
+            </span>
             <a
-              href="#"
-              className="w-10 h-10 sm:w-8 sm:h-8 rounded-full bg-white/[0.02] border border-white/[0.04] flex items-center justify-center hover:border-[#D4AF37]/15 active:border-[#D4AF37]/15 transition-all duration-300"
+              href="mailto:support@goldbridgecapital.io"
+              className="text-[#D4AF37] text-xs sm:text-[11px] hover:text-[#F3D889] transition-colors"
             >
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-[#444]">
-                <path d="M4 4l11.733 16h4.267l-11.733 -16h-4.267z" />
-                <path d="M4 20l6.768 -6.768m2.46 -2.46l6.772 -6.772" />
-              </svg>
-            </a>
-            <a
-              href="#"
-              className="w-10 h-10 sm:w-8 sm:h-8 rounded-full bg-white/[0.02] border border-white/[0.04] flex items-center justify-center hover:border-[#D4AF37]/15 active:border-[#D4AF37]/15 transition-all duration-300"
-            >
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-[#444]">
-                <path d="M4 4m0 2a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2z" />
-                <path d="M8 11l0 5" />
-                <path d="M8 8l0 .01" />
-                <path d="M12 16l0 -5" />
-                <path d="M16 16v-3a2 2 0 0 0 -4 0" />
-              </svg>
+              support@goldbridgecapital.io
             </a>
           </div>
         </div>
